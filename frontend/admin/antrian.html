@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Antrian — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">Manajemen Antrian</span>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Tambah Antrian</button>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="card">
+        <div class="card-header">
+          <div class="toolbar">
+            <select id="status-filter" class="form-control" style="width:160px" onchange="loadData()">
+              <option value="menunggu">Menunggu</option>
+              <option value="diproses">Diproses</option>
+              <option value="dibatalkan">Dibatalkan</option>
+            </select>
+          </div>
+          <span id="total-info" class="text-muted text-sm"></span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr>
+              <th>No. Antrian</th><th>Peminjam</th><th>Buku</th><th>Tgl Daftar</th><th>Status</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="data-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Tambah Antrian -->
+<div class="modal-backdrop" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Tambah ke Antrian</span>
+      <button class="modal-close" onclick="closeModal('add-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Peminjam *</label>
+        <input id="f-peminjam-q" type="text" class="form-control" placeholder="Ketik nama atau nomor induk…" oninput="searchPeminjam()">
+        <input type="hidden" id="f-peminjam-id">
+        <div id="peminjam-results" style="border:1px solid var(--border);border-radius:var(--radius);max-height:160px;overflow-y:auto;display:none;margin-top:4px;background:var(--white);"></div>
+        <div id="peminjam-selected" class="form-hint" style="color:var(--primary)"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Buku *</label>
+        <input id="f-buku-q" type="text" class="form-control" placeholder="Ketik judul buku…" oninput="searchBuku()">
+        <input type="hidden" id="f-buku-id">
+        <div id="buku-results" style="border:1px solid var(--border);border-radius:var(--radius);max-height:160px;overflow-y:auto;display:none;margin-top:4px;background:var(--white);"></div>
+        <div id="buku-selected" class="form-hint" style="color:var(--primary)"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('add-modal')">Batal</button>
+      <button class="btn btn-primary" id="add-btn" onclick="addAntrian()">Tambahkan</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('antrian');
+
+  async function loadData() {
+    const status = document.getElementById('status-filter').value;
+    const res    = await API.get(`/antrian?status=${status}`);
+    const data   = await res.json();
+    document.getElementById('total-info').textContent = `${data.length} antrian`;
+    const tbody = document.getElementById('data-body');
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Tidak ada antrian</td></tr>';
+    } else {
+      tbody.innerHTML = data.map(a => `
+        <tr>
+          <td><span style="font-size:20px;font-weight:800;color:var(--primary)">#${a.nomor_antrian}</span></td>
+          <td><strong>${a.peminjam_nama}</strong><br><span class="text-muted text-sm">${a.nomor_induk}</span></td>
+          <td>${a.buku_judul}</td>
+          <td>${fmtDate(a.tgl_daftar)}</td>
+          <td>${statusBadge(a.status)}</td>
+          <td>${a.status === 'menunggu'
+            ? `<button class="btn btn-danger btn-sm" onclick="batalkan(${a.id})">Batalkan</button>`
+            : '—'}</td>
+        </tr>`).join('');
+    }
+  }
+
+  async function batalkan(id) {
+    if (!confirmDialog('Batalkan antrian ini?')) return;
+    const res = await API.delete(`/antrian/${id}`);
+    if (!res.ok) { Toast.error('Gagal membatalkan antrian'); return; }
+    Toast.success('Antrian dibatalkan');
+    loadData();
+  }
+
+  function openAddModal() {
+    ['f-peminjam-q','f-peminjam-id','f-buku-q','f-buku-id'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('peminjam-selected').textContent = '';
+    document.getElementById('buku-selected').textContent = '';
+    document.getElementById('add-modal').classList.add('open');
+  }
+
+  let pTimer, bTimer;
+  function searchPeminjam() {
+    clearTimeout(pTimer);
+    pTimer = setTimeout(async () => {
+      const q = document.getElementById('f-peminjam-q').value.trim();
+      if (q.length < 2) { document.getElementById('peminjam-results').style.display='none'; return; }
+      const res  = await API.get(`/peminjam?q=${encodeURIComponent(q)}&limit=6`);
+      const data = await res.json();
+      const box  = document.getElementById('peminjam-results');
+      box.innerHTML = data.data.map(p =>
+        `<div style="padding:8px 12px;cursor:pointer;font-size:13px" onmousedown="selectPeminjam(${p.id},'${p.nama.replace(/'/g,"\\'")} (${p.nomor_induk})')" onmouseover="this.style.background='var(--primary-pale)'" onmouseout="this.style.background=''">
+          <strong>${p.nama}</strong> <span class="text-muted">${p.nomor_induk}</span>
+        </div>`).join('') || '<div style="padding:8px 12px;color:var(--text-sm)">Tidak ditemukan</div>';
+      box.style.display = 'block';
+    }, 300);
+  }
+  function selectPeminjam(id, label) {
+    document.getElementById('f-peminjam-id').value = id;
+    document.getElementById('f-peminjam-q').value  = label;
+    document.getElementById('peminjam-selected').textContent = '✓ Dipilih';
+    document.getElementById('peminjam-results').style.display = 'none';
+  }
+
+  function searchBuku() {
+    clearTimeout(bTimer);
+    bTimer = setTimeout(async () => {
+      const q = document.getElementById('f-buku-q').value.trim();
+      if (q.length < 2) { document.getElementById('buku-results').style.display='none'; return; }
+      const res  = await API.get(`/buku?q=${encodeURIComponent(q)}&limit=6`);
+      const data = await res.json();
+      const box  = document.getElementById('buku-results');
+      box.innerHTML = data.data.map(b =>
+        `<div style="padding:8px 12px;cursor:pointer;font-size:13px" onmousedown="selectBuku(${b.id},'${b.judul.replace(/'/g,"\\'")}',${b.stok_tersedia})" onmouseover="this.style.background='var(--primary-pale)'" onmouseout="this.style.background=''">
+          <strong>${b.judul}</strong> <span class="badge ${b.stok_tersedia>0?'badge-green':'badge-red'}" style="font-size:10px">stok: ${b.stok_tersedia}</span>
+        </div>`).join('') || '<div style="padding:8px 12px;color:var(--text-sm)">Tidak ditemukan</div>';
+      box.style.display = 'block';
+    }, 300);
+  }
+  function selectBuku(id, label, stok) {
+    document.getElementById('f-buku-id').value = id;
+    document.getElementById('f-buku-q').value  = label;
+    document.getElementById('buku-selected').textContent = stok === 0 ? '✓ Buku habis stok (cocok untuk antrian)' : `⚠ Stok masih ada: ${stok}`;
+    document.getElementById('buku-results').style.display = 'none';
+  }
+
+  async function addAntrian() {
+    const peminjam_id = document.getElementById('f-peminjam-id').value;
+    const buku_id     = document.getElementById('f-buku-id').value;
+    if (!peminjam_id || !buku_id) { Toast.error('Peminjam dan buku wajib dipilih'); return; }
+    const btn = document.getElementById('add-btn');
+    btn.disabled = true;
+    try {
+      const res  = await API.post('/antrian', { peminjam_id: parseInt(peminjam_id), buku_id: parseInt(buku_id) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      Toast.success(`Antrian #${data.nomor_antrian} berhasil ditambahkan`);
+      closeModal('add-modal');
+      loadData();
+    } catch (err) { Toast.error(err.message); }
+    finally { btn.disabled = false; }
+  }
+
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  loadData();
+</script>
+</body>
+</html>

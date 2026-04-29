@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Data Peminjam — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">Data Peminjam</span>
+      <div class="topbar-right">
+        <button class="btn btn-secondary btn-sm" onclick="openImportModal()">⬆ Import CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Tambah Peminjam</button>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="card">
+        <div class="card-header">
+          <div class="toolbar">
+            <div class="search-input">
+              <span class="search-icon">🔍</span>
+              <input id="q" type="text" class="form-control" placeholder="Cari nama atau nomor induk…" oninput="debounceSearch()" style="padding-left:34px">
+            </div>
+            <select id="tipe" class="form-control" style="width:140px" onchange="loadData(1)">
+              <option value="">Semua Tipe</option>
+              <option value="siswa">Siswa</option>
+              <option value="guru">Guru</option>
+            </select>
+          </div>
+          <span id="total-info" class="text-muted text-sm"></span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr>
+              <th>Nomor Induk</th><th>Nama</th><th>Tipe</th><th>Kelas</th><th>Email</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="data-body"></tbody>
+          </table>
+        </div>
+        <div class="card-body" style="padding-top:0">
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Form -->
+<div class="modal-backdrop" id="form-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Tambah Peminjam</span>
+      <button class="modal-close" onclick="closeModal('form-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="rec-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nomor Induk (NIS/NIP) *</label>
+          <input id="f-nomor" type="text" class="form-control" placeholder="Contoh: 12345">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap *</label>
+          <input id="f-nama" type="text" class="form-control" placeholder="Nama lengkap">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipe *</label>
+          <select id="f-tipe" class="form-control">
+            <option value="siswa">Siswa</option>
+            <option value="guru">Guru</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kelas</label>
+          <input id="f-kelas" type="text" class="form-control" placeholder="XI IPA 1">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Email</label>
+          <input id="f-email" type="email" class="form-control" placeholder="email@example.com">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('form-modal')">Batal</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveData()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal-backdrop" id="import-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Import Peminjam dari CSV</span>
+      <button class="modal-close" onclick="closeModal('import-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">
+        Format CSV: <code>nomor_induk, nama, tipe (siswa/guru), kelas, email</code><br>
+        Baris pertama harus berupa header.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pilih File CSV</label>
+        <input id="csv-file" type="file" accept=".csv" class="form-control">
+      </div>
+      <div id="import-result" style="display:none"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('import-modal')">Tutup</button>
+      <button class="btn btn-primary" onclick="doImport()">Import</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('peminjam');
+  let currentPage = 1, searchTimer;
+
+  async function loadData(page = 1) {
+    currentPage = page;
+    const q    = document.getElementById('q').value.trim();
+    const tipe = document.getElementById('tipe').value;
+    const p    = new URLSearchParams({ page, limit: 20 });
+    if (q)    p.append('q', q);
+    if (tipe) p.append('tipe', tipe);
+    const res  = await API.get(`/peminjam?${p}`);
+    const data = await res.json();
+    document.getElementById('total-info').textContent = `${data.total} peminjam`;
+    const tbody = document.getElementById('data-body');
+    if (!data.data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Tidak ada data peminjam</td></tr>';
+    } else {
+      tbody.innerHTML = data.data.map(d => `
+        <tr>
+          <td><code>${d.nomor_induk}</code></td>
+          <td><strong>${d.nama}</strong></td>
+          <td><span class="badge ${d.tipe==='guru'?'badge-blue':'badge-orange'}">${d.tipe}</span></td>
+          <td>${d.kelas || '—'}</td>
+          <td>${d.email || '—'}</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="openEditModal(${d.id})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteData(${d.id},'${d.nama.replace(/'/g,"\\'")}')">Hapus</button>
+          </td>
+        </tr>`).join('');
+    }
+    renderPagination('pagination', data.total, page, 20, 'loadData');
+  }
+
+  function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadData(1), 400); }
+
+  function openAddModal() {
+    document.getElementById('modal-title').textContent = 'Tambah Peminjam';
+    document.getElementById('rec-id').value = '';
+    ['nomor','nama','kelas','email'].forEach(f => document.getElementById('f-'+f).value = '');
+    document.getElementById('f-tipe').value = 'siswa';
+    document.getElementById('form-modal').classList.add('open');
+  }
+
+  async function openEditModal(id) {
+    document.getElementById('modal-title').textContent = 'Edit Peminjam';
+    const res = await API.get(`/peminjam/${id}`);
+    const d   = await res.json();
+    document.getElementById('rec-id').value    = d.id;
+    document.getElementById('f-nomor').value   = d.nomor_induk;
+    document.getElementById('f-nama').value    = d.nama;
+    document.getElementById('f-tipe').value    = d.tipe;
+    document.getElementById('f-kelas').value   = d.kelas || '';
+    document.getElementById('f-email').value   = d.email || '';
+    document.getElementById('form-modal').classList.add('open');
+  }
+
+  async function saveData() {
+    const id   = document.getElementById('rec-id').value;
+    const body = {
+      nomor_induk: document.getElementById('f-nomor').value.trim(),
+      nama:        document.getElementById('f-nama').value.trim(),
+      tipe:        document.getElementById('f-tipe').value,
+      kelas:       document.getElementById('f-kelas').value.trim() || null,
+      email:       document.getElementById('f-email').value.trim() || null,
+    };
+    if (!body.nomor_induk || !body.nama) { Toast.error('Nomor induk dan nama wajib diisi'); return; }
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    try {
+      const res  = id ? await API.put(`/peminjam/${id}`, body) : await API.post('/peminjam', body);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      Toast.success(id ? 'Data peminjam diperbarui' : 'Peminjam berhasil ditambahkan');
+      closeModal('form-modal');
+      loadData(currentPage);
+    } catch (err) { Toast.error(err.message); }
+    finally { btn.disabled = false; }
+  }
+
+  async function deleteData(id, nama) {
+    if (!confirmDialog(`Hapus peminjam "${nama}"?`)) return;
+    const res  = await API.delete(`/peminjam/${id}`);
+    const data = await res.json();
+    if (!res.ok) { Toast.error(data.message); return; }
+    Toast.success('Peminjam berhasil dihapus');
+    loadData(currentPage);
+  }
+
+  function openImportModal() {
+    document.getElementById('import-result').style.display = 'none';
+    document.getElementById('csv-file').value = '';
+    document.getElementById('import-modal').classList.add('open');
+  }
+
+  async function doImport() {
+    const file = document.getElementById('csv-file').files[0];
+    if (!file) { Toast.error('Pilih file CSV'); return; }
+    const fd = new FormData(); fd.append('file', file);
+    const res  = await API.upload('/peminjam/import', fd);
+    const data = await res.json();
+    const el   = document.getElementById('import-result');
+    el.style.display = 'block';
+    el.innerHTML = `<div class="alert ${res.ok?'alert-success':'alert-error'}">${data.message}</div>`;
+    if (res.ok) loadData(1);
+  }
+
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  loadData();
+</script>
+</body>
+</html>

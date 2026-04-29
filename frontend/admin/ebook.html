@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>E-Book Gutenberg — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">E-Book — Project Gutenberg</span>
+      <div class="topbar-right">
+        <span class="topbar-badge">Open Source · Gratis</span>
+      </div>
+    </div>
+    <div class="page-body">
+      <!-- Search bar -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-body">
+          <div class="form-row" style="align-items:flex-end">
+            <div class="form-group flex-1" style="margin-bottom:0">
+              <label class="form-label">Cari Judul atau Pengarang</label>
+              <input id="q" type="text" class="form-control" placeholder="Contoh: Sherlock Holmes, Pride and Prejudice…">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Bahasa</label>
+              <select id="lang" class="form-control" style="width:140px">
+                <option value="">Semua</option>
+                <option value="en">Inggris</option>
+                <option value="id">Indonesia</option>
+                <option value="fr">Perancis</option>
+                <option value="de">Jerman</option>
+                <option value="es">Spanyol</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="doSearch(1)">Cari E-Book</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="search-info" class="text-muted text-sm mb-16" style="margin-bottom:12px"></div>
+
+      <!-- Grid hasil -->
+      <div id="ebook-grid" class="ebook-grid"></div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination" style="margin-top:24px"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal detail buku -->
+<div class="modal-backdrop" id="detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="detail-title">Detail E-Book</span>
+      <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('detail-modal')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('ebook');
+  let currentPage = 1, currentTotal = 0;
+
+  document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(1); });
+
+  async function doSearch(page = 1) {
+    currentPage = page;
+    const q    = document.getElementById('q').value.trim();
+    const lang = document.getElementById('lang').value;
+    const grid = document.getElementById('ebook-grid');
+    grid.innerHTML = '<div class="loading-overlay" style="grid-column:1/-1"><div class="spinner"></div></div>';
+    document.getElementById('search-info').textContent = '';
+
+    const params = new URLSearchParams({ page });
+    if (q)    params.append('q', q);
+    if (lang) params.append('lang', lang);
+
+    const res = await API.get(`/ebook/search?${params}`);
+    if (!res) return;
+    const data = await res.json();
+
+    if (!res.ok) {
+      grid.innerHTML = `<div class="alert alert-error" style="grid-column:1/-1">${data.message}</div>`;
+      return;
+    }
+
+    currentTotal = data.total;
+    document.getElementById('search-info').textContent = `Ditemukan ${data.total.toLocaleString('id-ID')} e-book di Project Gutenberg${q ? ` untuk "${q}"` : ''}`;
+
+    if (!data.data.length) {
+      grid.innerHTML = '<p class="text-muted text-center" style="grid-column:1/-1;padding:40px">Tidak ada e-book ditemukan</p>';
+      return;
+    }
+
+    grid.innerHTML = data.data.map(b => {
+      const links = Object.entries(b.download).filter(([,url]) => url);
+      const dlBtns = links.map(([fmt, url]) => `<a href="${url}" target="_blank" class="btn btn-primary btn-sm">⬇ ${fmt.toUpperCase()}</a>`).join('');
+      return `
+        <div class="ebook-card">
+          <div class="ebook-cover" onclick="showDetail(${b.id})" style="cursor:pointer">
+            ${b.cover
+              ? `<img src="${b.cover}" alt="${b.judul}" loading="lazy">`
+              : `<span class="ebook-cover-placeholder">📖</span>`}
+          </div>
+          <div class="ebook-info">
+            <div class="ebook-title" title="${b.judul}">${b.judul}</div>
+            <div class="ebook-author">${b.pengarang}</div>
+            <div class="ebook-langs">${b.bahasa} · ${Number(b.unduhan).toLocaleString()} unduhan</div>
+          </div>
+          <div class="ebook-actions">
+            ${dlBtns || '<span class="text-muted text-sm">Tidak ada link unduhan</span>'}
+          </div>
+        </div>`;
+    }).join('');
+
+    renderPagination('pagination', Math.min(data.total, 1000), page, 32, 'doSearch');
+  }
+
+  async function showDetail(id) {
+    document.getElementById('detail-modal').classList.add('open');
+    document.getElementById('detail-title').textContent = 'Memuat…';
+    document.getElementById('detail-body').innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
+
+    const res  = await API.get(`/ebook/${id}`);
+    const b    = await res.json();
+    if (!res.ok) {
+      document.getElementById('detail-body').innerHTML = `<div class="alert alert-error">${b.message}</div>`;
+      return;
+    }
+    document.getElementById('detail-title').textContent = b.judul;
+
+    const links = Object.entries(b.download).filter(([,url]) => url);
+    const dlBtns = links.map(([fmt, url]) =>
+      `<a href="${url}" target="_blank" class="btn btn-primary">⬇ Download ${fmt.toUpperCase()}</a>`
+    ).join('');
+
+    document.getElementById('detail-body').innerHTML = `
+      <div style="display:flex;gap:24px;flex-wrap:wrap">
+        <div style="flex-shrink:0">
+          ${b.cover ? `<img src="${b.cover}" style="width:140px;border-radius:8px;box-shadow:var(--shadow)">` : '<div style="width:140px;height:200px;background:var(--primary-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px">📖</div>'}
+        </div>
+        <div style="flex:1;min-width:200px">
+          <h3 style="margin-bottom:8px;color:var(--text)">${b.judul}</h3>
+          <p class="text-muted" style="margin-bottom:12px">${b.pengarang}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+            <span class="badge badge-orange">${b.bahasa}</span>
+            <span class="badge badge-gray">${Number(b.unduhan).toLocaleString('id-ID')} unduhan</span>
+          </div>
+          ${b.subjek.length ? `<div style="margin-bottom:16px"><strong class="text-sm">Subjek:</strong><br>${b.subjek.slice(0,5).map(s => `<span class="badge badge-blue" style="margin:2px">${s}</span>`).join('')}</div>` : ''}
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${dlBtns || '<span class="text-muted">Tidak ada link unduhan tersedia</span>'}
+          </div>
+          <p class="text-muted" style="margin-top:12px;font-size:11px">
+            Sumber: <a href="https://www.gutenberg.org/ebooks/${b.id}" target="_blank" style="color:var(--primary)">Project Gutenberg #${b.id}</a>
+          </p>
+        </div>
+      </div>`;
+  }
+
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // Load default (buku populer)
+  doSearch(1);
+</script>
+</body>
+</html>

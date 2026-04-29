@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Laporan — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">Laporan Peminjaman</span>
+    </div>
+    <div class="page-body">
+      <!-- Filter periode -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-body">
+          <div class="form-row" style="align-items:flex-end">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Dari Tanggal</label>
+              <input id="dari" type="date" class="form-control">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Sampai Tanggal</label>
+              <input id="sampai" type="date" class="form-control">
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary" onclick="loadLaporan()">Tampilkan</button>
+              <button class="btn btn-secondary" onclick="downloadPDF()" id="pdf-btn">
+                ⬇ Download PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats ringkasan -->
+      <div class="stats-grid" id="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card accent"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="s-total">—</div></div>
+        <div class="stat-card accent"><div class="stat-label">Sedang Dipinjam</div><div class="stat-value" id="s-aktif">—</div></div>
+        <div class="stat-card accent"><div class="stat-label">Selesai</div><div class="stat-value" id="s-selesai">—</div></div>
+        <div class="stat-card accent"><div class="stat-label">Menunggu</div><div class="stat-value" id="s-tunggu">—</div></div>
+        <div class="stat-card accent"><div class="stat-label">Ditolak</div><div class="stat-value" id="s-tolak">—</div></div>
+      </div>
+
+      <!-- Buku terpopuler -->
+      <div class="card" style="margin-bottom:20px" id="popular-card">
+        <div class="card-header"><span class="card-title">Buku Terpopuler</span></div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>Judul</th><th>Pengarang</th><th>Jumlah Dipinjam</th></tr></thead>
+            <tbody id="popular-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tabel detail transaksi -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Detail Transaksi</span>
+          <span id="detail-count" class="text-muted text-sm"></span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr>
+              <th>Peminjam</th><th>Buku</th><th>Tgl Pengajuan</th>
+              <th>Tgl Pinjam</th><th>Batas Kembali</th><th>Tgl Kembali</th><th>Status</th>
+            </tr></thead>
+            <tbody id="detail-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('laporan');
+
+  // Default: bulan ini
+  const now   = new Date();
+  const bulan1 = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const hari  = now.toISOString().split('T')[0];
+  document.getElementById('dari').value   = bulan1;
+  document.getElementById('sampai').value = hari;
+
+  async function loadLaporan() {
+    const dari   = document.getElementById('dari').value;
+    const sampai = document.getElementById('sampai').value;
+    if (!dari || !sampai) { Toast.error('Pilih periode terlebih dahulu'); return; }
+
+    const res  = await API.get(`/laporan?dari=${dari}&sampai=${sampai}`);
+    const data = await res.json();
+    if (!res.ok) { Toast.error(data.message); return; }
+
+    // Stats
+    const s = data.stats;
+    document.getElementById('s-total').textContent   = s.total;
+    document.getElementById('s-aktif').textContent   = s.aktif;
+    document.getElementById('s-selesai').textContent = s.selesai;
+    document.getElementById('s-tunggu').textContent  = s.menunggu;
+    document.getElementById('s-tolak').textContent   = s.ditolak;
+
+    // Buku terpopuler
+    const pb = document.getElementById('popular-body');
+    if (!data.bukuTerpopuler.length) {
+      pb.innerHTML = '<tr><td colspan="3" class="table-empty">Tidak ada data</td></tr>';
+    } else {
+      pb.innerHTML = data.bukuTerpopuler.map((b, i) => `
+        <tr>
+          <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1)+'.'} ${b.judul}</td>
+          <td>${b.pengarang || '—'}</td>
+          <td><span class="badge badge-orange">${b.jumlah}×</span></td>
+        </tr>`).join('');
+    }
+
+    // Detail transaksi
+    document.getElementById('detail-count').textContent = `${data.transaksi.length} transaksi`;
+    const tb = document.getElementById('detail-body');
+    if (!data.transaksi.length) {
+      tb.innerHTML = '<tr><td colspan="7" class="table-empty">Tidak ada transaksi pada periode ini</td></tr>';
+    } else {
+      tb.innerHTML = data.transaksi.map(t => `
+        <tr>
+          <td><strong>${t.peminjam_nama}</strong><br><span class="text-muted text-sm">${t.nomor_induk}</span></td>
+          <td>${t.buku_judul}</td>
+          <td>${fmtDate(t.tgl_pengajuan)}</td>
+          <td>${fmtDate(t.tgl_pinjam)}</td>
+          <td>${fmtDate(t.tgl_kembali_rencana)}</td>
+          <td>${fmtDate(t.tgl_kembali_aktual)}</td>
+          <td>${statusBadge(t.status)}</td>
+        </tr>`).join('');
+    }
+  }
+
+  function downloadPDF() {
+    const dari   = document.getElementById('dari').value;
+    const sampai = document.getElementById('sampai').value;
+    if (!dari || !sampai) { Toast.error('Pilih periode terlebih dahulu'); return; }
+    const token = API.getToken();
+    // Buka di tab baru dengan token di query (untuk PDF download)
+    window.open(`/api/laporan/pdf?dari=${dari}&sampai=${sampai}&token=${token}`, '_blank');
+  }
+
+  loadLaporan();
+</script>
+</body>
+</html>

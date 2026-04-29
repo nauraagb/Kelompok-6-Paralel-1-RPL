@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Dashboard — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">Dashboard</span>
+      <div class="topbar-right">
+        <span id="today-date" class="text-muted text-sm"></span>
+        <span class="topbar-badge">Admin</span>
+      </div>
+    </div>
+    <div class="page-body">
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card accent"><div class="stat-label">Total Buku</div><div class="stat-value" id="s-buku">—</div><div class="stat-sub">judul tersedia</div></div>
+        <div class="stat-card accent"><div class="stat-label">Stok Tersedia</div><div class="stat-value" id="s-stok">—</div><div class="stat-sub">unit di rak</div></div>
+        <div class="stat-card accent"><div class="stat-label">Total Peminjam</div><div class="stat-value" id="s-peminjam">—</div><div class="stat-sub">siswa & guru</div></div>
+        <div class="stat-card accent"><div class="stat-label">Pinjaman Aktif</div><div class="stat-value" id="s-aktif">—</div><div class="stat-sub">sedang dipinjam</div></div>
+        <div class="stat-card accent"><div class="stat-label">Menunggu</div><div class="stat-value" id="s-tunggu">—</div><div class="stat-sub">perlu konfirmasi</div></div>
+        <div class="stat-card accent"><div class="stat-label">Antrian</div><div class="stat-value" id="s-antrian">—</div><div class="stat-sub">buku habis stok</div></div>
+      </div>
+
+      <!-- Recent transactions -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Transaksi Terbaru</span>
+          <a href="/admin/peminjaman.html" class="btn btn-secondary btn-sm">Lihat Semua</a>
+        </div>
+        <div class="table-wrapper">
+          <table id="recent-table">
+            <thead><tr>
+              <th>Peminjam</th><th>Buku</th><th>Tgl Pengajuan</th><th>Batas Kembali</th><th>Status</th>
+            </tr></thead>
+            <tbody id="recent-body"><tr><td colspan="5" class="table-empty"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('dashboard');
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  async function loadDashboard() {
+    const res  = await API.get('/laporan/dashboard');
+    if (!res) return;
+    const data = await res.json();
+    const s    = data.stats;
+    document.getElementById('s-buku').textContent    = s.total_buku;
+    document.getElementById('s-stok').textContent    = s.stok_tersedia;
+    document.getElementById('s-peminjam').textContent= s.total_peminjam;
+    document.getElementById('s-aktif').textContent   = s.pinjaman_aktif;
+    document.getElementById('s-tunggu').textContent  = s.menunggu_konfirmasi;
+    document.getElementById('s-antrian').textContent = s.antrian_aktif;
+
+    const tbody = document.getElementById('recent-body');
+    if (!data.recent.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Belum ada transaksi</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.recent.map(t => `
+      <tr>
+        <td>${t.peminjam_nama}</td>
+        <td>${t.buku_judul}</td>
+        <td>${fmtDate(t.tgl_pengajuan)}</td>
+        <td>${fmtDate(t.tgl_kembali_rencana)}</td>
+        <td>${statusBadge(t.status)}</td>
+      </tr>`).join('');
+  }
+  loadDashboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Pengembalian — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">Proses Pengembalian</span>
+    </div>
+    <div class="page-body">
+      <!-- Quick lookup card -->
+      <div class="card mb-16" style="margin-bottom:20px">
+        <div class="card-header"><span class="card-title">Cari Transaksi Peminjaman</span></div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group" style="grid-column:1/-1">
+              <label class="form-label">Nama Peminjam atau Judul Buku</label>
+              <div class="toolbar">
+                <input id="q" type="text" class="form-control flex-1" placeholder="Ketik nama atau judul…">
+                <button class="btn btn-primary" onclick="loadData(1)">Cari</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Buku Sedang Dipinjam</span>
+          <span id="total-info" class="text-muted text-sm"></span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr>
+              <th>Peminjam</th><th>Buku</th><th>Tgl Pinjam</th>
+              <th>Batas Kembali</th><th>Keterlambatan</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="data-body"></tbody>
+          </table>
+        </div>
+        <div class="card-body" style="padding-top:0">
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('pengembalian');
+  let currentPage = 1;
+
+  document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') loadData(1); });
+
+  async function loadData(page = 1) {
+    currentPage = page;
+    const q = document.getElementById('q').value.trim();
+    const p = new URLSearchParams({ page, limit: 20, status: 'dipinjam' });
+    if (q) p.append('q', q);
+    const res  = await API.get(`/peminjaman?${p}`);
+    const data = await res.json();
+    document.getElementById('total-info').textContent = `${data.total} pinjaman aktif`;
+    const tbody = document.getElementById('data-body');
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    if (!data.data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Tidak ada buku yang sedang dipinjam</td></tr>';
+    } else {
+      tbody.innerHTML = data.data.map(t => {
+        const batas    = new Date(t.tgl_kembali_rencana);
+        const diffDays = Math.floor((today - batas) / 86400000);
+        const terlambat = diffDays > 0
+          ? `<span class="badge badge-red">Terlambat ${diffDays} hari</span>`
+          : `<span class="badge badge-green">Tepat waktu</span>`;
+        return `<tr>
+          <td><strong>${t.peminjam_nama}</strong><br><span class="text-muted text-sm">${t.nomor_induk}</span></td>
+          <td>${t.buku_judul}</td>
+          <td>${fmtDate(t.tgl_pinjam)}</td>
+          <td>${fmtDate(t.tgl_kembali_rencana)}</td>
+          <td>${terlambat}</td>
+          <td><button class="btn btn-primary btn-sm" onclick="prosesPengembalian(${t.id},'${t.peminjam_nama.replace(/'/g,"\\'")}','${t.buku_judul.replace(/'/g,"\\'")}')">↩ Kembalikan</button></td>
+        </tr>`;
+      }).join('');
+    }
+    renderPagination('pagination', data.total, page, 20, 'loadData');
+  }
+
+  async function prosesPengembalian(id, nama, judul) {
+    if (!confirmDialog(`Konfirmasi pengembalian buku "${judul}" dari ${nama}?`)) return;
+    const res  = await API.put(`/peminjaman/${id}/kembalikan`, {});
+    const data = await res.json();
+    if (!res.ok) { Toast.error(data.message); return; }
+    Toast.success('Pengembalian berhasil dicatat');
+    loadData(currentPage);
+  }
+
+  loadData();
+</script>
+</body>
+</html>

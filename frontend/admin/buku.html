@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Kelola Buku — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">Kelola Buku</span>
+      <div class="topbar-right">
+        <button class="btn btn-secondary btn-sm" onclick="openImportModal()">⬆ Import CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Tambah Buku</button>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="card">
+        <div class="card-header">
+          <div class="toolbar">
+            <div class="search-input">
+              <span class="search-icon">🔍</span>
+              <input id="q" type="text" class="form-control" placeholder="Cari judul atau pengarang…" oninput="debounceSearch()" style="padding-left:34px">
+            </div>
+            <select id="kat" class="form-control" style="width:160px" onchange="loadBuku(1)">
+              <option value="">Semua Kategori</option>
+            </select>
+          </div>
+          <span id="total-info" class="text-muted text-sm"></span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr>
+              <th>Judul</th><th>Pengarang</th><th>Penerbit</th><th>Tahun</th>
+              <th>Kategori</th><th>Stok</th><th>Tersedia</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="buku-body"></tbody>
+          </table>
+        </div>
+        <div class="card-body" style="padding-top:0">
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Tambah/Edit -->
+<div class="modal-backdrop" id="form-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Tambah Buku</span>
+      <button class="modal-close" onclick="closeModal('form-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="buku-id">
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Judul *</label>
+          <input id="f-judul" type="text" class="form-control" placeholder="Judul buku">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pengarang</label>
+          <input id="f-pengarang" type="text" class="form-control" placeholder="Nama pengarang">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Penerbit</label>
+          <input id="f-penerbit" type="text" class="form-control" placeholder="Nama penerbit">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tahun Terbit</label>
+          <input id="f-tahun" type="number" class="form-control" placeholder="2024" min="1900" max="2099">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ISBN</label>
+          <input id="f-isbn" type="text" class="form-control" placeholder="978-xxx-xxx-xxx">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <input id="f-kategori" type="text" class="form-control" placeholder="Matematika, Fisika…">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jumlah Stok</label>
+          <input id="f-stok" type="number" class="form-control" placeholder="1" min="1" value="1">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('form-modal')">Batal</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveBuku()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Import CSV -->
+<div class="modal-backdrop" id="import-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Import Buku dari CSV</span>
+      <button class="modal-close" onclick="closeModal('import-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">
+        Format CSV: <code>judul, pengarang, penerbit, tahun_terbit, isbn, kategori, jumlah_stok</code><br>
+        Baris pertama harus berupa header.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pilih File CSV</label>
+        <input id="csv-file" type="file" accept=".csv" class="form-control">
+      </div>
+      <div id="import-result" style="display:none"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('import-modal')">Tutup</button>
+      <button class="btn btn-primary" onclick="doImport()">Import</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('buku');
+  let currentPage = 1;
+  let searchTimer;
+
+  async function loadKategori() {
+    const res  = await API.get('/buku/kategori');
+    const data = await res.json();
+    const sel  = document.getElementById('kat');
+    data.forEach(k => sel.innerHTML += `<option value="${k}">${k}</option>`);
+  }
+
+  async function loadBuku(page = 1) {
+    currentPage = page;
+    const q   = document.getElementById('q').value.trim();
+    const kat = document.getElementById('kat').value;
+    const params = new URLSearchParams({ page, limit: 15 });
+    if (q)   params.append('q', q);
+    if (kat) params.append('kategori', kat);
+    const res  = await API.get(`/buku?${params}`);
+    const data = await res.json();
+    document.getElementById('total-info').textContent = `${data.total} buku`;
+    const tbody = document.getElementById('buku-body');
+    if (!data.data.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="table-empty">Tidak ada buku ditemukan</td></tr>';
+    } else {
+      tbody.innerHTML = data.data.map(b => `
+        <tr>
+          <td><strong>${b.judul}</strong></td>
+          <td>${b.pengarang || '—'}</td>
+          <td>${b.penerbit || '—'}</td>
+          <td>${b.tahun_terbit || '—'}</td>
+          <td>${b.kategori ? `<span class="badge badge-orange">${b.kategori}</span>` : '—'}</td>
+          <td>${b.jumlah_stok}</td>
+          <td><span class="badge ${b.stok_tersedia > 0 ? 'badge-green' : 'badge-red'}">${b.stok_tersedia}</span></td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="openEditModal(${b.id})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteBuku(${b.id},'${b.judul.replace(/'/g,"\\'")}')">Hapus</button>
+          </td>
+        </tr>`).join('');
+    }
+    renderPagination('pagination', data.total, page, 15, 'loadBuku');
+  }
+
+  function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadBuku(1), 400);
+  }
+
+  function openAddModal() {
+    document.getElementById('modal-title').textContent = 'Tambah Buku';
+    document.getElementById('buku-id').value = '';
+    ['judul','pengarang','penerbit','tahun','isbn','kategori'].forEach(f => document.getElementById('f-'+f).value = '');
+    document.getElementById('f-stok').value = 1;
+    document.getElementById('form-modal').classList.add('open');
+  }
+
+  async function openEditModal(id) {
+    document.getElementById('modal-title').textContent = 'Edit Buku';
+    const res = await API.get(`/buku/${id}`);
+    const b   = await res.json();
+    document.getElementById('buku-id').value    = b.id;
+    document.getElementById('f-judul').value    = b.judul || '';
+    document.getElementById('f-pengarang').value= b.pengarang || '';
+    document.getElementById('f-penerbit').value = b.penerbit || '';
+    document.getElementById('f-tahun').value    = b.tahun_terbit || '';
+    document.getElementById('f-isbn').value     = b.isbn || '';
+    document.getElementById('f-kategori').value = b.kategori || '';
+    document.getElementById('f-stok').value     = b.jumlah_stok || 1;
+    document.getElementById('form-modal').classList.add('open');
+  }
+
+  async function saveBuku() {
+    const id   = document.getElementById('buku-id').value;
+    const body = {
+      judul:        document.getElementById('f-judul').value.trim(),
+      pengarang:    document.getElementById('f-pengarang').value.trim(),
+      penerbit:     document.getElementById('f-penerbit').value.trim(),
+      tahun_terbit: document.getElementById('f-tahun').value || null,
+      isbn:         document.getElementById('f-isbn').value.trim(),
+      kategori:     document.getElementById('f-kategori').value.trim(),
+      jumlah_stok:  parseInt(document.getElementById('f-stok').value) || 1,
+    };
+    if (!body.judul) { Toast.error('Judul wajib diisi'); return; }
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    try {
+      const res  = id ? await API.put(`/buku/${id}`, body) : await API.post('/buku', body);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      Toast.success(id ? 'Buku berhasil diperbarui' : 'Buku berhasil ditambahkan');
+      closeModal('form-modal');
+      loadBuku(currentPage);
+      loadKategori();
+    } catch (err) { Toast.error(err.message); }
+    finally { btn.disabled = false; }
+  }
+
+  async function deleteBuku(id, judul) {
+    if (!confirmDialog(`Hapus buku "${judul}"?`)) return;
+    const res  = await API.delete(`/buku/${id}`);
+    const data = await res.json();
+    if (!res.ok) { Toast.error(data.message); return; }
+    Toast.success('Buku berhasil dihapus');
+    loadBuku(currentPage);
+  }
+
+  function openImportModal() {
+    document.getElementById('import-result').style.display = 'none';
+    document.getElementById('csv-file').value = '';
+    document.getElementById('import-modal').classList.add('open');
+  }
+
+  async function doImport() {
+    const file = document.getElementById('csv-file').files[0];
+    if (!file) { Toast.error('Pilih file CSV terlebih dahulu'); return; }
+    const fd = new FormData();
+    fd.append('file', file);
+    const res  = await API.upload('/buku/import', fd);
+    const data = await res.json();
+    const el   = document.getElementById('import-result');
+    el.style.display = 'block';
+    el.innerHTML = `<div class="alert ${res.ok ? 'alert-success' : 'alert-error'}">${data.message}</div>`;
+    if (res.ok) { loadBuku(1); loadKategori(); }
+  }
+
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  loadKategori();
+  loadBuku();
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-left">
+    <div class="login-hero">
+      <div class="login-hero-icon">📚</div>
+      <h1>Perpustakaan SMA Pesat Bogor</h1>
+      <p>Sistem Informasi Perpustakaan Digital yang memudahkan pengelolaan buku, peminjaman, dan laporan.</p>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-form-wrap">
+      <div class="login-logo">
+        <h2>Selamat Datang</h2>
+        <p>Masuk ke panel administrasi perpustakaan</p>
+      </div>
+      <div class="login-form">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input id="username" type="text" class="form-control" placeholder="Masukkan username" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input id="password" type="password" class="form-control" placeholder="Masukkan password" autocomplete="current-password">
+        </div>
+        <div id="login-error" class="login-error"></div>
+        <button id="login-btn" class="btn btn-primary login-btn" onclick="doLogin()">
+          Masuk
+        </button>
+      </div>
+      <p class="text-muted text-sm" style="margin-top:24px; text-align:center;">
+        Default: admin / admin123
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script>
+  // Jika sudah login, redirect ke dashboard
+  if (API.getToken()) window.location.href = '/admin/dashboard.html';
+
+  document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  async function doLogin() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const errEl    = document.getElementById('login-error');
+    const btn      = document.getElementById('login-btn');
+    errEl.style.display = 'none';
+    if (!username || !password) {
+      errEl.textContent = 'Username dan password wajib diisi';
+      errEl.style.display = 'block';
+      return;
+    }
+    btn.disabled    = true;
+    btn.textContent = 'Memproses…';
+    try {
+      const res  = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Login gagal');
+      API.setToken(data.token);
+      API.setUser(data.user);
+      window.location.href = '/admin/dashboard.html';
+    } catch (err) {
+      errEl.textContent    = err.message;
+      errEl.style.display  = 'block';
+      btn.disabled         = false;
+      btn.textContent      = 'Masuk';
+    }
+  }
+</script>
+</body>
+</html>

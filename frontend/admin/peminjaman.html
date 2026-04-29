@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Peminjaman — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside id="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">Peminjaman</span>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Buat Pengajuan</button>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="card">
+        <div class="card-header">
+          <div class="toolbar">
+            <div class="search-input">
+              <span class="search-icon">🔍</span>
+              <input id="q" type="text" class="form-control" placeholder="Cari nama atau judul buku…" oninput="debounceSearch()" style="padding-left:34px">
+            </div>
+            <select id="status-filter" class="form-control" style="width:160px" onchange="loadData(1)">
+              <option value="">Semua Status</option>
+              <option value="menunggu">Menunggu</option>
+              <option value="dipinjam">Dipinjam</option>
+              <option value="selesai">Selesai</option>
+              <option value="ditolak">Ditolak</option>
+              <option value="dibatalkan">Dibatalkan</option>
+            </select>
+          </div>
+          <span id="total-info" class="text-muted text-sm"></span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr>
+              <th>Peminjam</th><th>Buku</th><th>Tgl Pengajuan</th>
+              <th>Tgl Pinjam</th><th>Batas Kembali</th><th>Status</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="data-body"></tbody>
+          </table>
+        </div>
+        <div class="card-body" style="padding-top:0">
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Buat Pengajuan -->
+<div class="modal-backdrop" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Buat Pengajuan Peminjaman</span>
+      <button class="modal-close" onclick="closeModal('add-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nomor Induk / Nama Peminjam *</label>
+        <input id="f-peminjam-q" type="text" class="form-control" placeholder="Ketik untuk mencari…" oninput="searchPeminjam()">
+        <input type="hidden" id="f-peminjam-id">
+        <div id="peminjam-results" style="border:1px solid var(--border);border-radius:var(--radius);max-height:160px;overflow-y:auto;display:none;margin-top:4px;background:var(--white);"></div>
+        <div id="peminjam-selected" class="form-hint" style="color:var(--primary)"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Judul Buku *</label>
+        <input id="f-buku-q" type="text" class="form-control" placeholder="Ketik untuk mencari…" oninput="searchBuku()">
+        <input type="hidden" id="f-buku-id">
+        <div id="buku-results" style="border:1px solid var(--border);border-radius:var(--radius);max-height:160px;overflow-y:auto;display:none;margin-top:4px;background:var(--white);"></div>
+        <div id="buku-selected" class="form-hint" style="color:var(--primary)"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Batas Kembali *</label>
+        <input id="f-batas" type="date" class="form-control">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('add-modal')">Batal</button>
+      <button class="btn btn-primary" id="add-btn" onclick="createPeminjaman()">Buat Pengajuan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tolak -->
+<div class="modal-backdrop" id="tolak-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Tolak Pengajuan</span>
+      <button class="modal-close" onclick="closeModal('tolak-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Alasan Penolakan</label>
+        <textarea id="f-catatan" class="form-control" rows="3" placeholder="Tulis alasan…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('tolak-modal')">Batal</button>
+      <button class="btn btn-danger" onclick="confirmTolak()">Tolak Pengajuan</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('peminjaman');
+  let currentPage = 1, searchTimer, tolakId = null;
+
+  // Set default batas kembali = 14 hari dari sekarang
+  const d = new Date(); d.setDate(d.getDate()+14);
+  document.getElementById('f-batas').value = d.toISOString().split('T')[0];
+
+  async function loadData(page = 1) {
+    currentPage = page;
+    const q  = document.getElementById('q').value.trim();
+    const st = document.getElementById('status-filter').value;
+    const p  = new URLSearchParams({ page, limit: 20 });
+    if (q)  p.append('q', q);
+    if (st) p.append('status', st);
+    const res  = await API.get(`/peminjaman?${p}`);
+    const data = await res.json();
+    document.getElementById('total-info').textContent = `${data.total} transaksi`;
+    const tbody = document.getElementById('data-body');
+    if (!data.data.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="table-empty">Tidak ada data peminjaman</td></tr>';
+    } else {
+      tbody.innerHTML = data.data.map(t => {
+        let aksi = '';
+        if (t.status === 'menunggu') {
+          aksi = `<button class="btn btn-success btn-sm" onclick="setujui(${t.id})">✓ Setujui</button>
+                  <button class="btn btn-danger btn-sm" onclick="openTolak(${t.id})">✕ Tolak</button>`;
+        }
+        return `<tr>
+          <td><strong>${t.peminjam_nama}</strong><br><span class="text-muted text-sm">${t.nomor_induk} · ${t.peminjam_tipe}</span></td>
+          <td>${t.buku_judul}</td>
+          <td>${fmtDate(t.tgl_pengajuan)}</td>
+          <td>${fmtDate(t.tgl_pinjam)}</td>
+          <td>${fmtDate(t.tgl_kembali_rencana)}</td>
+          <td>${statusBadge(t.status)}</td>
+          <td>${aksi}</td>
+        </tr>`;
+      }).join('');
+    }
+    renderPagination('pagination', data.total, page, 20, 'loadData');
+  }
+
+  function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadData(1), 400); }
+
+  async function setujui(id) {
+    if (!confirmDialog('Setujui peminjaman ini?')) return;
+    const res  = await API.put(`/peminjaman/${id}/setujui`, {});
+    const data = await res.json();
+    if (!res.ok) { Toast.error(data.message); return; }
+    Toast.success('Peminjaman disetujui');
+    loadData(currentPage);
+  }
+
+  function openTolak(id) {
+    tolakId = id;
+    document.getElementById('f-catatan').value = '';
+    document.getElementById('tolak-modal').classList.add('open');
+  }
+
+  async function confirmTolak() {
+    const catatan = document.getElementById('f-catatan').value.trim();
+    const res  = await API.put(`/peminjaman/${tolakId}/tolak`, { catatan });
+    const data = await res.json();
+    if (!res.ok) { Toast.error(data.message); return; }
+    Toast.success('Pengajuan ditolak');
+    closeModal('tolak-modal');
+    loadData(currentPage);
+  }
+
+  // ── Autocomplete peminjam ──
+  let peminjamTimer;
+  function searchPeminjam() {
+    clearTimeout(peminjamTimer);
+    peminjamTimer = setTimeout(async () => {
+      const q = document.getElementById('f-peminjam-q').value.trim();
+      if (q.length < 2) { document.getElementById('peminjam-results').style.display='none'; return; }
+      const res  = await API.get(`/peminjam?q=${encodeURIComponent(q)}&limit=6`);
+      const data = await res.json();
+      const box  = document.getElementById('peminjam-results');
+      if (!data.data.length) { box.style.display='none'; return; }
+      box.innerHTML = data.data.map(p =>
+        `<div style="padding:8px 12px;cursor:pointer;font-size:13px;" onmousedown="selectPeminjam(${p.id},'${p.nama.replace(/'/g,"\\'")} (${p.nomor_induk})')" onmouseover="this.style.background='var(--primary-pale)'" onmouseout="this.style.background=''">
+          <strong>${p.nama}</strong> <span class="text-muted">${p.nomor_induk} · ${p.tipe}</span>
+        </div>`).join('');
+      box.style.display = 'block';
+    }, 300);
+  }
+  function selectPeminjam(id, label) {
+    document.getElementById('f-peminjam-id').value  = id;
+    document.getElementById('f-peminjam-q').value   = label;
+    document.getElementById('peminjam-selected').textContent = '✓ Peminjam dipilih';
+    document.getElementById('peminjam-results').style.display = 'none';
+  }
+
+  // ── Autocomplete buku ──
+  let bukuTimer;
+  function searchBuku() {
+    clearTimeout(bukuTimer);
+    bukuTimer = setTimeout(async () => {
+      const q = document.getElementById('f-buku-q').value.trim();
+      if (q.length < 2) { document.getElementById('buku-results').style.display='none'; return; }
+      const res  = await API.get(`/buku?q=${encodeURIComponent(q)}&limit=6`);
+      const data = await res.json();
+      const box  = document.getElementById('buku-results');
+      if (!data.data.length) { box.style.display='none'; return; }
+      box.innerHTML = data.data.map(b =>
+        `<div style="padding:8px 12px;cursor:pointer;font-size:13px;" onmousedown="selectBuku(${b.id},'${b.judul.replace(/'/g,"\\'")}',${b.stok_tersedia})" onmouseover="this.style.background='var(--primary-pale)'" onmouseout="this.style.background=''">
+          <strong>${b.judul}</strong> <span class="badge ${b.stok_tersedia>0?'badge-green':'badge-red'}" style="font-size:10px">stok: ${b.stok_tersedia}</span>
+        </div>`).join('');
+      box.style.display = 'block';
+    }, 300);
+  }
+  function selectBuku(id, label, stok) {
+    document.getElementById('f-buku-id').value  = id;
+    document.getElementById('f-buku-q').value   = label;
+    document.getElementById('buku-selected').textContent = stok > 0 ? `✓ Stok tersedia: ${stok}` : '⚠ Stok habis';
+    document.getElementById('buku-results').style.display = 'none';
+  }
+
+  function openAddModal() {
+    document.getElementById('f-peminjam-q').value = '';
+    document.getElementById('f-peminjam-id').value = '';
+    document.getElementById('f-peminjam-selected') && (document.getElementById('peminjam-selected').textContent = '');
+    document.getElementById('f-buku-q').value = '';
+    document.getElementById('f-buku-id').value = '';
+    document.getElementById('buku-selected').textContent = '';
+    document.getElementById('add-modal').classList.add('open');
+  }
+
+  async function createPeminjaman() {
+    const peminjam_id       = document.getElementById('f-peminjam-id').value;
+    const buku_id           = document.getElementById('f-buku-id').value;
+    const tgl_kembali_rencana = document.getElementById('f-batas').value;
+    if (!peminjam_id || !buku_id || !tgl_kembali_rencana) {
+      Toast.error('Peminjam, buku, dan batas kembali wajib diisi'); return;
+    }
+    const btn = document.getElementById('add-btn');
+    btn.disabled = true;
+    try {
+      const res  = await API.post('/peminjaman', { peminjam_id: parseInt(peminjam_id), buku_id: parseInt(buku_id), tgl_kembali_rencana });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      Toast.success('Pengajuan peminjaman berhasil dibuat');
+      closeModal('add-modal');
+      loadData(1);
+    } catch (err) { Toast.error(err.message); }
+    finally { btn.disabled = false; }
+  }
+
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  loadData();
+</script>
+</body>
+</html>
