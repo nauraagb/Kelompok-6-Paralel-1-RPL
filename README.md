@@ -1,14 +1,14 @@
 # Sistem Informasi Perpustakaan SMA Pesat Bogor
 
-Aplikasi web manajemen perpustakaan berbasis Node.js + Express + PostgreSQL dengan integrasi Project Gutenberg API untuk e-book.
+Aplikasi web manajemen perpustakaan dengan integrasi Project Gutenberg API untuk e-book.
 
 ## Stack
 - **Backend**: Node.js, Express.js
 - **Database**: PostgreSQL
-- **Frontend**: HTML/CSS/JS Vanilla (tema putih-oranye)
+- **Frontend**: HTML/CSS/JS Vanilla
 - **Auth**: JWT (jsonwebtoken + bcryptjs)
 - **PDF**: PDFKit
-- **E-Book API**: Project Gutenberg (gutendex.com)
+- **E-Book API**: Project Gutenberg
 
 ## Struktur Project
 ```
@@ -93,11 +93,8 @@ Buka browser: **http://localhost:3000**
 
 **Login default:**
 - Username: `admin`
-- Password: `admin123`
+- Password: `password`
 
-> ⚠️ Segera ganti password setelah login pertama!
-
----
 
 ## Fitur Admin
 

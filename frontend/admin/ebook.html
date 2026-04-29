@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>E-Book Gutenberg — Perpustakaan SMA Pesat Bogor</title>
+  <title>E-Book — Perpustakaan SMA Pesat Bogor</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -10,13 +10,11 @@
   <aside id="sidebar"></aside>
   <main class="main-content">
     <div class="topbar">
-      <span class="topbar-title">E-Book — Project Gutenberg</span>
+      <span class="topbar-title">E-Book</span>
       <div class="topbar-right">
-        <span class="topbar-badge">Open Source · Gratis</span>
       </div>
     </div>
     <div class="page-body">
-      <!-- Search bar -->
       <div class="card" style="margin-bottom:20px">
         <div class="card-body">
           <div class="form-row" style="align-items:flex-end">
@@ -42,16 +40,13 @@
 
       <div id="search-info" class="text-muted text-sm mb-16" style="margin-bottom:12px"></div>
 
-      <!-- Grid hasil -->
       <div id="ebook-grid" class="ebook-grid"></div>
 
-      <!-- Pagination -->
       <div class="pagination" id="pagination" style="margin-top:24px"></div>
     </div>
   </main>
 </div>
 
-<!-- Modal detail buku -->
 <div class="modal-backdrop" id="detail-modal">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -169,7 +164,6 @@
 
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-  // Load default (buku populer)
   doSearch(1);
 </script>
 </body>

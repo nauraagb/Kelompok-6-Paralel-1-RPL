@@ -30,7 +30,7 @@ function initSidebar(activePage) {
   document.getElementById('sidebar').innerHTML = `
     <div class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo">📚</div>
+        <div class="sidebar-logo"></div>
         <div>
           <div class="sidebar-name">Perpustakaan</div>
           <div class="sidebar-sub">SMA Pesat Bogor</div>

@@ -11,7 +11,6 @@ const JOIN = `
   JOIN buku     b ON b.id = tp.buku_id
 `;
 
-// GET /api/peminjaman
 router.get('/', auth, async (req, res) => {
   const { status, q, page = 1, limit = 20 } = req.query;
   const offset = (page - 1) * limit;
@@ -26,25 +25,21 @@ router.get('/', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// GET /api/peminjaman/:id
 router.get('/:id', auth, async (req, res) => {
   const { rows } = await db.query(`${JOIN} WHERE tp.id=$1`, [req.params.id]);
   if (!rows.length) return res.status(404).json({ message: 'Data tidak ditemukan' });
   res.json(rows[0]);
 });
 
-// POST /api/peminjaman  – buat pengajuan baru
 router.post('/', auth, async (req, res) => {
   const { peminjam_id, buku_id, tgl_kembali_rencana } = req.body;
   if (!peminjam_id || !buku_id || !tgl_kembali_rencana)
     return res.status(400).json({ message: 'peminjam_id, buku_id, dan tgl_kembali_rencana wajib diisi' });
   try {
-    // Cek stok
     const buku = await db.query('SELECT * FROM buku WHERE id=$1', [buku_id]);
     if (!buku.rows.length) return res.status(404).json({ message: 'Buku tidak ditemukan' });
     if (buku.rows[0].stok_tersedia < 1)
       return res.status(400).json({ message: 'Stok buku habis', stok: 0 });
-    // Cek peminjam tidak punya pinjaman aktif untuk buku ini
     const cek = await db.query(
       "SELECT id FROM transaksi_peminjaman WHERE peminjam_id=$1 AND buku_id=$2 AND status IN ('menunggu','dipinjam')",
       [peminjam_id, buku_id]
@@ -61,7 +56,6 @@ router.post('/', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// PUT /api/peminjaman/:id/setujui
 router.put('/:id/setujui', auth, async (req, res) => {
   const client = await require('../db').connect();
   try {
@@ -84,7 +78,6 @@ router.put('/:id/setujui', auth, async (req, res) => {
   } finally { client.release(); }
 });
 
-// PUT /api/peminjaman/:id/tolak
 router.put('/:id/tolak', auth, async (req, res) => {
   const { catatan } = req.body;
   try {
@@ -99,7 +92,6 @@ router.put('/:id/tolak', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// PUT /api/peminjaman/:id/kembalikan
 router.put('/:id/kembalikan', auth, async (req, res) => {
   const client = await require('../db').connect();
   try {
@@ -112,7 +104,6 @@ router.put('/:id/kembalikan', auth, async (req, res) => {
       `UPDATE transaksi_peminjaman SET status='selesai', tgl_kembali_aktual=CURRENT_DATE, admin_id=$1
        WHERE id=$2 RETURNING *`, [req.user.id, req.params.id]
     );
-    // Cek antrian — otomatis buat pengajuan untuk antrian pertama
     const antrian = await client.query(
       `SELECT * FROM antrian WHERE buku_id=$1 AND status='menunggu' ORDER BY nomor_antrian ASC LIMIT 1`,
       [rows[0].buku_id]

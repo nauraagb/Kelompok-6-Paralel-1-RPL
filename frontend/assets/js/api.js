@@ -38,7 +38,6 @@ const API = {
   },
 };
 
-// ── Toast notifications ──────────────────────────────────────────
 const Toast = {
   container: null,
   init() {
@@ -62,7 +61,6 @@ const Toast = {
 };
 Toast.init();
 
-// ── Status badge helper ──────────────────────────────────────────
 function statusBadge(status) {
   const map = {
     menunggu:    ['badge-yellow',  'Menunggu'],
@@ -76,16 +74,13 @@ function statusBadge(status) {
   return `<span class="badge ${cls}">${label}</span>`;
 }
 
-// ── Format date ──────────────────────────────────────────────────
 function fmtDate(d) {
   if (!d) return '-';
   return new Date(d).toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
 }
 
-// ── Confirm dialog ───────────────────────────────────────────────
 function confirmDialog(msg) { return window.confirm(msg); }
 
-// ── Pagination ───────────────────────────────────────────────────
 function renderPagination(containerId, total, page, limit, onPageChange) {
   const el    = document.getElementById(containerId);
   if (!el) return;

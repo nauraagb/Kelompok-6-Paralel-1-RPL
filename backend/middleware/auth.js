@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 
 function authMiddleware(req, res, next) {
   const header = req.headers['authorization'];
-  // Allow token via query string for PDF/file downloads opened in new tab
   const token = (header && header.startsWith('Bearer ') ? header.slice(7) : null)
     || req.query.token || null;
   if (!token) {

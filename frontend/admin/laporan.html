@@ -13,7 +13,6 @@
       <span class="topbar-title">Laporan Peminjaman</span>
     </div>
     <div class="page-body">
-      <!-- Filter periode -->
       <div class="card" style="margin-bottom:20px">
         <div class="card-body">
           <div class="form-row" style="align-items:flex-end">
@@ -35,7 +34,6 @@
         </div>
       </div>
 
-      <!-- Stats ringkasan -->
       <div class="stats-grid" id="stats-grid" style="margin-bottom:20px">
         <div class="stat-card accent"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="s-total">—</div></div>
         <div class="stat-card accent"><div class="stat-label">Sedang Dipinjam</div><div class="stat-value" id="s-aktif">—</div></div>
@@ -44,7 +42,6 @@
         <div class="stat-card accent"><div class="stat-label">Ditolak</div><div class="stat-value" id="s-tolak">—</div></div>
       </div>
 
-      <!-- Buku terpopuler -->
       <div class="card" style="margin-bottom:20px" id="popular-card">
         <div class="card-header"><span class="card-title">Buku Terpopuler</span></div>
         <div class="table-wrapper">
@@ -55,7 +52,6 @@
         </div>
       </div>
 
-      <!-- Tabel detail transaksi -->
       <div class="card">
         <div class="card-header">
           <span class="card-title">Detail Transaksi</span>
@@ -80,7 +76,6 @@
 <script>
   initSidebar('laporan');
 
-  // Default: bulan ini
   const now   = new Date();
   const bulan1 = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
   const hari  = now.toISOString().split('T')[0];
@@ -96,7 +91,6 @@
     const data = await res.json();
     if (!res.ok) { Toast.error(data.message); return; }
 
-    // Stats
     const s = data.stats;
     document.getElementById('s-total').textContent   = s.total;
     document.getElementById('s-aktif').textContent   = s.aktif;
@@ -104,7 +98,6 @@
     document.getElementById('s-tunggu').textContent  = s.menunggu;
     document.getElementById('s-tolak').textContent   = s.ditolak;
 
-    // Buku terpopuler
     const pb = document.getElementById('popular-body');
     if (!data.bukuTerpopuler.length) {
       pb.innerHTML = '<tr><td colspan="3" class="table-empty">Tidak ada data</td></tr>';
@@ -117,7 +110,6 @@
         </tr>`).join('');
     }
 
-    // Detail transaksi
     document.getElementById('detail-count').textContent = `${data.transaksi.length} transaksi`;
     const tb = document.getElementById('detail-body');
     if (!data.transaksi.length) {
@@ -141,7 +133,6 @@
     const sampai = document.getElementById('sampai').value;
     if (!dari || !sampai) { Toast.error('Pilih periode terlebih dahulu'); return; }
     const token = API.getToken();
-    // Buka di tab baru dengan token di query (untuk PDF download)
     window.open(`/api/laporan/pdf?dari=${dari}&sampai=${sampai}&token=${token}`, '_blank');
   }
 

@@ -1,10 +1,6 @@
--- Sistem Informasi Perpustakaan SMA Pesat Bogor
--- Schema PostgreSQL
-
 CREATE DATABASE perpustakaan_sma;
 \c perpustakaan_sma;
 
--- Admin users
 CREATE TABLE IF NOT EXISTS users (
   id        SERIAL PRIMARY KEY,
   username  VARCHAR(100) UNIQUE NOT NULL,
@@ -13,7 +9,6 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Peminjam (siswa & guru)
 CREATE TABLE IF NOT EXISTS peminjam (
   id           SERIAL PRIMARY KEY,
   nomor_induk  VARCHAR(50) UNIQUE NOT NULL,
@@ -24,7 +19,6 @@ CREATE TABLE IF NOT EXISTS peminjam (
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Buku fisik
 CREATE TABLE IF NOT EXISTS buku (
   id             SERIAL PRIMARY KEY,
   judul          VARCHAR(300) NOT NULL,
@@ -38,7 +32,6 @@ CREATE TABLE IF NOT EXISTS buku (
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Transaksi peminjaman
 CREATE TABLE IF NOT EXISTS transaksi_peminjaman (
   id                  SERIAL PRIMARY KEY,
   peminjam_id         INTEGER NOT NULL REFERENCES peminjam(id),
@@ -54,7 +47,6 @@ CREATE TABLE IF NOT EXISTS transaksi_peminjaman (
   created_at          TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Antrian
 CREATE TABLE IF NOT EXISTS antrian (
   id             SERIAL PRIMARY KEY,
   peminjam_id    INTEGER NOT NULL REFERENCES peminjam(id),
@@ -66,13 +58,11 @@ CREATE TABLE IF NOT EXISTS antrian (
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Index untuk performa
 CREATE INDEX IF NOT EXISTS idx_transaksi_status ON transaksi_peminjaman(status);
 CREATE INDEX IF NOT EXISTS idx_transaksi_peminjam ON transaksi_peminjaman(peminjam_id);
 CREATE INDEX IF NOT EXISTS idx_transaksi_buku ON transaksi_peminjaman(buku_id);
 CREATE INDEX IF NOT EXISTS idx_antrian_buku ON antrian(buku_id);
 
--- Default admin (password: admin123)
 INSERT INTO users (username, password, nama)
 VALUES ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Perpustakaan')
 ON CONFLICT (username) DO NOTHING;

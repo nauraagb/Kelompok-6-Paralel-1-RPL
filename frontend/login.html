@@ -10,7 +10,7 @@
 <div class="login-page">
   <div class="login-left">
     <div class="login-hero">
-      <div class="login-hero-icon">📚</div>
+      <div class="login-hero-icon"></div>
       <h1>Perpustakaan SMA Pesat Bogor</h1>
       <p>Sistem Informasi Perpustakaan Digital yang memudahkan pengelolaan buku, peminjaman, dan laporan.</p>
     </div>
@@ -36,7 +36,7 @@
         </button>
       </div>
       <p class="text-muted text-sm" style="margin-top:24px; text-align:center;">
-        Default: admin / admin123
+        Default: admin / password
       </p>
     </div>
   </div>
@@ -44,7 +44,6 @@
 
 <script src="/assets/js/api.js"></script>
 <script>
-  // Jika sudah login, redirect ke dashboard
   if (API.getToken()) window.location.href = '/admin/dashboard.html';
 
   document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });

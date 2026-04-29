@@ -4,7 +4,6 @@ const jwt     = require('jsonwebtoken');
 const db      = require('../db');
 const auth    = require('../middleware/auth');
 
-// POST /api/auth/login
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -31,7 +30,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /api/auth/me
 router.get('/me', auth, async (req, res) => {
   try {
     const { rows } = await db.query('SELECT id, username, nama, created_at FROM users WHERE id=$1', [req.user.id]);
@@ -42,7 +40,6 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
-// PUT /api/auth/password  (ganti password)
 router.put('/password', auth, async (req, res) => {
   const { password_lama, password_baru } = req.body;
   if (!password_lama || !password_baru)

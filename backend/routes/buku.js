@@ -6,7 +6,6 @@ const auth = require('../middleware/auth');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
-// GET /api/buku  – list + search
 router.get('/', auth, async (req, res) => {
   const { q, kategori, page = 1, limit = 20 } = req.query;
   const offset = (page - 1) * limit;
@@ -26,20 +25,17 @@ router.get('/', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// GET /api/buku/kategori – daftar kategori unik
 router.get('/kategori', auth, async (req, res) => {
   const { rows } = await db.query("SELECT DISTINCT kategori FROM buku WHERE kategori IS NOT NULL ORDER BY kategori");
   res.json(rows.map(r => r.kategori));
 });
 
-// GET /api/buku/:id
 router.get('/:id', auth, async (req, res) => {
   const { rows } = await db.query('SELECT * FROM buku WHERE id=$1', [req.params.id]);
   if (!rows.length) return res.status(404).json({ message: 'Buku tidak ditemukan' });
   res.json(rows[0]);
 });
 
-// POST /api/buku
 router.post('/', auth, async (req, res) => {
   const { judul, pengarang, penerbit, tahun_terbit, isbn, kategori, jumlah_stok } = req.body;
   if (!judul) return res.status(400).json({ message: 'Judul wajib diisi' });
@@ -54,7 +50,6 @@ router.post('/', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// PUT /api/buku/:id
 router.put('/:id', auth, async (req, res) => {
   const { judul, pengarang, penerbit, tahun_terbit, isbn, kategori, jumlah_stok } = req.body;
   try {
@@ -75,7 +70,6 @@ router.put('/:id', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// DELETE /api/buku/:id
 router.delete('/:id', auth, async (req, res) => {
   try {
     const check = await db.query(
@@ -89,7 +83,6 @@ router.delete('/:id', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// POST /api/buku/import  – upload CSV
 router.post('/import', auth, upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'File CSV tidak ditemukan' });
   const records = [];

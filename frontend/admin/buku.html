@@ -21,7 +21,7 @@
         <div class="card-header">
           <div class="toolbar">
             <div class="search-input">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon"></span>
               <input id="q" type="text" class="form-control" placeholder="Cari judul atau pengarang…" oninput="debounceSearch()" style="padding-left:34px">
             </div>
             <select id="kat" class="form-control" style="width:160px" onchange="loadBuku(1)">
@@ -47,7 +47,6 @@
   </main>
 </div>
 
-<!-- Modal Tambah/Edit -->
 <div class="modal-backdrop" id="form-modal">
   <div class="modal">
     <div class="modal-header">
@@ -94,7 +93,6 @@
   </div>
 </div>
 
-<!-- Modal Import CSV -->
 <div class="modal-backdrop" id="import-modal">
   <div class="modal">
     <div class="modal-header">

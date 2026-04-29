@@ -17,10 +17,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static frontend files
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// API routes
 app.use('/api/auth',       authRoute);
 app.use('/api/buku',       bukuRoute);
 app.use('/api/peminjam',   peminjamRoute);
@@ -29,14 +27,13 @@ app.use('/api/antrian',    antrianRoute);
 app.use('/api/laporan',    laporanRoute);
 app.use('/api/ebook',      ebookRoute);
 
-// Fallback to login
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/login.html'));
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`\n🟠 Perpustakaan SMA Pesat Bogor`);
+  console.log(`\nPerpustakaan SMA Pesat Bogor`);
   console.log(`   Server  : http://localhost:${PORT}`);
   console.log(`   Login   : http://localhost:${PORT}/login.html`);
   console.log(`   Default : admin / admin123\n`);

@@ -4,7 +4,6 @@ const auth   = require('../middleware/auth');
 
 const GUTENDEX = 'https://gutendex.com/books';
 
-// GET /api/ebook/search?q=keyword&lang=en&page=1
 router.get('/search', auth, async (req, res) => {
   const { q = '', lang = '', page = 1 } = req.query;
   try {
@@ -32,7 +31,6 @@ router.get('/search', auth, async (req, res) => {
   }
 });
 
-// GET /api/ebook/:id  – detail satu buku
 router.get('/:id', auth, async (req, res) => {
   try {
     const resp = await axios.get(`${GUTENDEX}/${req.params.id}`, { timeout: 8000 });

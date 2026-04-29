@@ -3,7 +3,6 @@ const PDFDoc  = require('pdfkit');
 const db      = require('../db');
 const auth    = require('../middleware/auth');
 
-// GET /api/laporan?dari=YYYY-MM-DD&sampai=YYYY-MM-DD
 router.get('/', auth, async (req, res) => {
   const { dari = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
           sampai = new Date().toISOString().split('T')[0] } = req.query;
@@ -42,7 +41,6 @@ router.get('/', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// GET /api/laporan/pdf
 router.get('/pdf', auth, async (req, res) => {
   const { dari = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
           sampai = new Date().toISOString().split('T')[0] } = req.query;
@@ -76,7 +74,6 @@ router.get('/pdf', auth, async (req, res) => {
     const GRAY   = '#6B7280';
     const W      = doc.page.width - 80;
 
-    // Header
     doc.rect(0, 0, doc.page.width, 90).fill(ORANGE);
     doc.fillColor('white').fontSize(18).font('Helvetica-Bold')
        .text('LAPORAN PEMINJAMAN BUKU', 40, 25, { align: 'center' });
@@ -84,7 +81,6 @@ router.get('/pdf', auth, async (req, res) => {
        .text('Sistem Informasi Perpustakaan SMA Pesat Bogor', 40, 48, { align: 'center' });
     doc.fontSize(10).text(`Periode: ${dari} s/d ${sampai}`, 40, 66, { align: 'center' });
 
-    // Stats row
     doc.fillColor(DARK).rect(40, 110, W, 70).fill('#FFF7ED').stroke();
     const statItems = [
       { label: 'Total', val: stats.total },
@@ -101,7 +97,6 @@ router.get('/pdf', auth, async (req, res) => {
          .text(s.label, x, 148, { width: W/5, align: 'center' });
     });
 
-    // Table header
     let y = 200;
     const cols = [{ w: 30 }, { w: 80 }, { w: 140 }, { w: 90 }, { w: 70 }, { w: 80 }];
     const headers = ['No', 'Tgl Pengajuan', 'Buku', 'Peminjam', 'NIS/NIP', 'Status'];
@@ -146,7 +141,6 @@ router.get('/pdf', auth, async (req, res) => {
          .text('Tidak ada data peminjaman pada periode ini.', 40, y + 20, { align: 'center', width: W });
     }
 
-    // Footer
     doc.fillColor(GRAY).fontSize(8)
        .text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}  —  Admin Perpustakaan SMA Pesat Bogor`,
               40, doc.page.height - 40, { align: 'center', width: W });
@@ -157,7 +151,6 @@ router.get('/pdf', auth, async (req, res) => {
   }
 });
 
-// GET /api/laporan/dashboard  – stats untuk dashboard
 router.get('/dashboard', auth, async (req, res) => {
   try {
     const stats = await db.query(`
