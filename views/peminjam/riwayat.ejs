@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Peminjaman</title>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    <h2>Riwayat Peminjaman</h2>
+
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nama Buku</th>
+                <th>Tanggal Pengajuan</th>
+                <th>Tanggal Rencana Kembali</th>
+                <th>Tanggal Kembali Aktual</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <% peminjaman.forEach(row => { %>
+                <tr>
+                    <td><%= row.id %></td>
+                    <td><%= row.judul %></td>
+                    <td><%= row.tgl_pengajuan %></td>
+                    <td><%= row.tgl_kembali_rencana %></td>
+                    <td><%= row.tgl_kembali_aktual || '-' %></td>
+                    <td><%= row.status %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+</body>
+</html>

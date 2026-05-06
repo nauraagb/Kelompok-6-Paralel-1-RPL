@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+      <%- include('../partials/navbar') %>
+
+      <% buku.forEach(b => { %>
+            <div class="buku-card">
+            <h2><%=b.judul %></h2>    
+            <p><%= b.penulis %></p>
+            <p><%= b.katalog %></p>
+
+            <p>Stok Tersedia: <%= b.stok_tersedia %></p>
+            <a href="/api/peminjam/detail/<%=b.id%>">Detail</a>
+            </div>
+     <% }); %>
+</body>
+</html>

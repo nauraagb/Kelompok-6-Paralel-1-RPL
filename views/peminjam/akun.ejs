@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Akun Saya</title>
+</head>
+<body>
+
+  <h2>Akun Saya</h2>
+
+  <table border="1" cellpadding="10">
+    <tr>
+      <td>Nomor Induk</td>
+      <td><%= user.nomor_induk %></td>
+    </tr>
+    <tr>
+      <td>Nama</td>
+      <td><%= user.nama %></td>
+    </tr>
+    <tr>
+      <td>Tipe</td>
+      <td><%= user.tipe %></td>
+    </tr>
+    <tr>
+      <td>Kelas</td>
+      <td><%= user.kelas || '-' %></td>
+    </tr>
+    <tr>
+      <td>Email</td>
+      <td><%= user.email || '-' %></td>
+    </tr>
+    <tr>
+      <td>Bergabung Sejak</td>
+      <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+    </tr>
+  </table>
+
+  <br>
+
+  <!-- <a href="/peminjam/edit-akun">Edit Profil</a> -->
+
+</body>
+</html>

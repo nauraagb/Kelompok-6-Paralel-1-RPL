@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Peminjaman</title>
+</head>
+<body>
+    <!-- SIDE NAVBAR DI SINI -->
+    <p id="namaBuku"></p>
+    <form action="/api/peminjam/ajukanPinjaman" method="POST">
+        Tanggal Pengembalian Rencana:
+        <input type="date" name="tanggalKembaliExpected" required>
+
+        <input type="hidden" name="idBuku" id="idBuku">
+
+        <button type="submit">Ajukan</button>
+    </form>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+
+        if (!id) {
+            alert("ID buku tidak ditemukan di URL");
+        }
+
+        document.getElementById('idBuku').value = id;
+
+        fetch(`/api/buku/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('namaBuku').innerText = data.judul;
+            })
+            .catch(err => console.log("Error fetch buku:", err));
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Peminjam — Perpustakaan SMA Pesat Bogor</title>
+    <link rel="stylesheet" href="/assets/css/style.css" />
+  </head>
+  <body>
+    <div class="login-page">
+      <div class="login-left">
+        <div class="login-hero">
+          <div class="login-hero-icon">📚</div>
+          <h1>Perpustakaan SMA Pesat Bogor</h1>
+          <p>Login sebagai peminjam untuk melihat dan meminjam buku.</p>
+        </div>
+      </div>
+
+      <div class="login-right">
+        <div class="login-form-wrap">
+          <div class="login-logo">
+            <h2>Login Peminjam</h2>
+            <p>Masukkan NISN dan Password</p>
+          </div>
+
+          <div class="login-form">
+            <div class="form-group">
+              <label class="form-label">Nomor Induk Siswa Nasional</label>
+              <input
+                id="username"
+                type="text"
+                class="form-control"
+                placeholder="Masukkan NISN"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input
+                id="password"
+                type="password"
+                class="form-control"
+                placeholder="Masukkan password"
+              />
+            </div>
+
+            <div id="login-error" class="login-error"></div>
+
+            <button
+              id="login-btn"
+              class="btn btn-primary login-btn"
+              onclick="doLogin()"
+            >
+              Masuk
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/assets/js/api.js"></script>
+    <script>
+      // kalau sudah login → ke dashboard peminjam
+      //   if (API.getToken()) window.location.href = 'views/peminjam/dashboard.ht';
+
+      document.getElementById("password").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") doLogin();
+      });
+
+      async function doLogin() {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+        const errEl = document.getElementById("login-error");
+        const btn = document.getElementById("login-btn");
+
+        errEl.style.display = "none";
+
+        if (!username || !password) {
+          errEl.textContent = "Nomor Induk dan password wajib diisi";
+          errEl.style.display = "block";
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Memproses…";
+
+        try {
+          const res = await fetch("/api/peminjam/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+            credentials: "include",
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Login gagal");
+
+          //   API.setToken(data.token);
+          //   API.setUser(data.user);
+
+          window.location.href = "/api/peminjam/dashboard";
+        } catch (err) {
+          errEl.textContent = err.message;
+          errEl.style.display = "block";
+          btn.disabled = false;
+          btn.textContent = "Masuk";
+        }
+      }
+    </script>
+  </body>
+</html>

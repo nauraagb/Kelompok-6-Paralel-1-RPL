@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Buku</title>
+</head>
+<body>
+     <%- include('../partials/navbar') %>
+
+     <div class="detail">
+       <h1><%= detail.judul %></h1>
+
+        <p>ISBN: <%= detail.isbn %></p>
+        <p>Tahun Terbit: <%= detail.tahun_terbit %></p>
+        <p>Kategori: <%= detail.kategori %></p>
+        <p>Jumlah Eksemplar: <%= detail.jumlah_stok %></p>
+        <p>Stok Tersedia: <%= detail.stok_tersedia %></p>
+
+        <% if (detail.stok_tersedia != 0) { %>
+        <a href="/api/peminjam/formaja?id=<%= detail.id %>">Pinjam</a>
+        <% } else { %>
+        <a href="/antri">Ajukan Antrian</a>
+        <% } %>
+     </div>
+</body>
+</html>

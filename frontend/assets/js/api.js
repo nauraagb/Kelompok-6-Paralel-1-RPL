@@ -33,7 +33,7 @@ const API = {
   },
 
   requireAuth() {
-    if (!this.getToken()) { window.location.href = '/login.html'; return false; }
+    if (!this.getToken()) { window.location.href = '/admin/login.html'; return false; }
     return true;
   },
 };

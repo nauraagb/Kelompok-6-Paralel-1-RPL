@@ -1,10 +1,60 @@
 const router = require('express').Router();
+const express = require('express');
 const multer = require('multer');
 const { parse } = require('csv-parse');
 const db   = require('../db');
 const auth = require('../middleware/auth');
-
+const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const upload = multer({ storage: multer.memoryStorage() });
+const path = require('path');
+const QRCode = require('qrcode');
+const crypto = require('crypto');
+
+// router.use(cookieParser());
+
+router.use('/static', express.static('frontend'));
+
+router.post('/login', async (req, res) => {
+   const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).json({ message: 'Username dan password wajib diisi' });
+
+  try {
+    const { rows } = await db.query('SELECT * FROM peminjam WHERE nomor_induk=$1', [username]);
+    if (!rows.length)
+      return res.status(401).json({ message: 'Username atau password salah' });
+
+    const peminjam  = rows[0];
+    const valid = await bcrypt.compare(password, peminjam.password);
+    if (!valid)
+      return res.status(401).json({ message: 'Username atau password salah' });
+
+    const token = jwt.sign(
+      { id: peminjam.id, username: peminjam.username, nama: peminjam.nama },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
+    );
+    // res.json({ token, peminjam: { id: peminjam.id, username: peminjam.username, nama: peminjam.nama } });
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    res.json({success: true});
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+    console.log(err.message);
+  }
+});
+
+router.get('/dashboard', auth, async (req, res) => {
+  res.render("peminjam/dashboard", {
+    user: req.user
+  });
+});
 
 // GET /api/peminjam
 router.get('/', auth, async (req, res) => {
@@ -24,11 +74,11 @@ router.get('/', auth, async (req, res) => {
 });
 
 // GET /api/peminjam/:id
-router.get('/:id', auth, async (req, res) => {
-  const { rows } = await db.query('SELECT * FROM peminjam WHERE id=$1', [req.params.id]);
-  if (!rows.length) return res.status(404).json({ message: 'Peminjam tidak ditemukan' });
-  res.json(rows[0]);
-});
+// router.get('/:id', auth, async (req, res) => {
+//   const { rows } = await db.query('SELECT * FROM peminjam WHERE id=$1', [req.params.id]);
+//   if (!rows.length) return res.status(404).json({ message: 'Peminjam tidak ditemukan' });
+//   res.json(rows[0]);
+// });
 
 // POST /api/peminjam
 router.post('/', auth, async (req, res) => {
@@ -100,6 +150,139 @@ router.post('/import', auth, upload.single('file'), async (req, res) => {
     }
     res.json({ message: `${ok} berhasil, ${skip} dilewati`, inserted: ok, skipped: skip });
   });
+});
+
+
+router.post('/ajukanPinjaman', auth, async (req, res) => {
+    const id = req.user.id;
+
+    try {
+      const { tanggalKembaliExpected, idBuku } = req.body;
+      const today = new Date().toISOString().split('T')[0];
+      const status = "menunggu";
+      const token = crypto.randomBytes(20).toString('hex');
+      const expired = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      const result = await db.query(
+        `INSERT INTO transaksi_peminjaman 
+        (peminjam_id, buku_id, tgl_pengajuan, tgl_kembali_rencana, status, qr_token, qr_expired_at) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7) 
+        RETURNING id, qr_token`,
+        [id, idBuku, today, tanggalKembaliExpected, status, token, expired]
+);
+
+      const borrowed = result.rows[0];
+      console.log('PEMINJAMAN DIAJUKAN: ', borrowed.id);
+      const url = `${req.protocol}://${req.get('host')}/admin/scan?token=${borrowed.qr_token}`;
+      const qr = await QRCode.toDataURL(url);
+
+      res.render('peminjam/qr', { qr });
+
+    } catch(err){
+      console.log('ERROR: ', err.message);
+    }
+});
+
+router.get('/formaja', auth, async (req, res) => {
+   res.sendFile(
+    path.join(process.cwd(), 'frontend/peminjam/formPeminjaman.html')
+  );
+});
+
+router.get('/katalog', async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT 
+        id,
+        judul,
+        pengarang,
+        penerbit,
+        isbn,
+        tahun_terbit,
+        jumlah_stok,
+        stok_tersedia,
+        kategori
+      FROM buku
+      ORDER BY judul ASC
+    `);
+    res.render('peminjam/katalog', {
+      buku: result.rows
+    });
+  } catch (err){
+    console.log('ERROR: ', err.message);
+  }
+});
+
+
+router.get('/detail/:id', auth, async(req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(`SELECT 
+        id,
+        judul,
+        pengarang,
+        penerbit,
+        isbn,
+        tahun_terbit,
+        jumlah_stok,
+        stok_tersedia,
+        kategori
+      FROM buku
+      WHERE id = $1`, [id]);
+    if(result.rows.length == 0){
+       return res.status(404).send("Buku tidak ditemukan");
+    }
+    res.render('peminjam/detailBuku', {
+      detail: result.rows[0]
+    });
+  } catch (err){
+    console.log('ERROR: ', err.message);
+  }
+});
+
+router.get("/riwayat", auth, async(req, res) => {
+  const id = req.user.id;
+  try{
+    const result = await db.query(`SELECT 
+        tp.id,
+        b.judul AS judul,
+        tp.tgl_pengajuan,
+        tp.tgl_kembali_rencana,
+        tp.tgl_kembali_aktual,
+        tp.status
+      FROM transaksi_peminjaman tp
+      JOIN buku b ON tp.buku_id = b.id
+      WHERE tp.peminjam_id = $1;`, [id]);
+    res.render("peminjam/riwayat", {
+      peminjaman: result.rows
+    });
+  } catch (err){
+    console.log("ERROR: ", err.message);
+  }
+});
+
+router.get('/akun', auth, async (req, res) => {
+  try {
+    const id = req.user.id;
+
+    const result = await db.query(`
+      SELECT nomor_induk, nama, tipe, kelas, email, created_at
+      FROM peminjam
+      WHERE id = $1
+    `, [id]);
+
+    if (!result.rows.length) {
+      return res.send("User tidak ditemukan");
+    }
+
+    res.render('peminjam/akun', {
+      user: result.rows[0]
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.send("Error");
+  }
 });
 
 module.exports = router;
