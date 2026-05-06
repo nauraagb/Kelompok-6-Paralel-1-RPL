@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <h1>Ajukan Antrian?</h1>
+
+        <form action="/api/peminjam/antri/<%= bookId %>" method="POST">
+        <button type="submit">Ajukan</button>
+        </form>
+
+        <a href="/api/peminjam/katalog">Batal</a>
+    </div>
+</body>
+</html>

@@ -20,7 +20,7 @@
         <% if (detail.stok_tersedia != 0) { %>
         <a href="/api/peminjam/formaja?id=<%= detail.id %>">Pinjam</a>
         <% } else { %>
-        <a href="/antri">Ajukan Antrian</a>
+        <a href="/api/peminjam/antrianPage/<%= detail.id %>">Ajukan Antrian</a>
         <% } %>
      </div>
 </body>

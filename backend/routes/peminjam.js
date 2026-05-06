@@ -240,6 +240,52 @@ router.get('/detail/:id', auth, async(req, res) => {
   }
 });
 
+router.post('/antri/:id', auth, async(req, res) => {
+    const client = await db.connect();
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+
+      const buku = await client.query(`SELECT stok_tersedia FROM buku WHERE id = $1`, [id]);
+      if (buku.rows[0].stok_tersedia > 0) {
+      throw new Error('Stok masih ada, tidak perlu antri');
+    }
+
+      const cekAntri = await client.query(`SELECT * FROM antrian WHERE peminjam_id = $1 AND buku_id = $2 AND status = 'menunggu'`, [userId, id]);
+      if(cekAntri.rows.length > 0){
+        throw new Error("Anda sudah dalam antrian.");
+        
+      }
+
+      const last = await client.query(
+      `SELECT MAX(nomor_antrian) as max 
+       FROM antrian 
+       WHERE buku_id = $1`,
+      [id]
+    );
+
+      const nomor = (last.rows[0].max || 0) + 1;
+
+    
+      await client.query(`
+        INSERT INTO antrian (peminjam_id, buku_id, nomor_antrian)
+        VALUES ($1, $2, $3)
+      `, [userId, id, nomor]);
+
+      await client.query('COMMIT');
+      res.redirect("/dashboard");
+      } catch(err){
+        console.log("ERROR: ", err.message);
+      }
+});
+
+router.get("/antrianPage/:id", auth, async(req, res) => {
+  const { id } = req.params;
+  res.render('peminjam/antrian', {
+    bookId: id
+  })
+});
+
 router.get("/riwayat", auth, async(req, res) => {
   const id = req.user.id;
   try{
