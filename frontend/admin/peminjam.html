@@ -81,6 +81,10 @@
           <label class="form-label">Email</label>
           <input id="f-email" type="email" class="form-control" placeholder="email@example.com">
         </div>
+        <div class="form-group"  style="grid-column:1/-1">
+          <label class="form-label">Password*</label>
+          <input id="f-password" type="text" class="form-control" placeholder="nama00x">
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -156,7 +160,7 @@
   function openAddModal() {
     document.getElementById('modal-title').textContent = 'Tambah Peminjam';
     document.getElementById('rec-id').value = '';
-    ['nomor','nama','kelas','email'].forEach(f => document.getElementById('f-'+f).value = '');
+    ['nomor','nama','kelas','email','password'].forEach(f => document.getElementById('f-'+f).value = '');
     document.getElementById('f-tipe').value = 'siswa';
     document.getElementById('form-modal').classList.add('open');
   }
@@ -171,6 +175,7 @@
     document.getElementById('f-tipe').value    = d.tipe;
     document.getElementById('f-kelas').value   = d.kelas || '';
     document.getElementById('f-email').value   = d.email || '';
+    documnet.getElementById('f-password').value = d.password;
     document.getElementById('form-modal').classList.add('open');
   }
 
@@ -182,8 +187,10 @@
       tipe:        document.getElementById('f-tipe').value,
       kelas:       document.getElementById('f-kelas').value.trim() || null,
       email:       document.getElementById('f-email').value.trim() || null,
+      password: document.getElementById('f-password').value
     };
     if (!body.nomor_induk || !body.nama) { Toast.error('Nomor induk dan nama wajib diisi'); return; }
+    if (!body.password) { Toast.error('Password wajib diisi'); return;}
     const btn = document.getElementById('save-btn');
     btn.disabled = true;
     try {

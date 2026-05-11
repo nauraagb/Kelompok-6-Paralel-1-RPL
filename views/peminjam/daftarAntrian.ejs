@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Antrian Saya</title>
+</head>
+<body>
+    <!-- views/peminjam/daftarAntrian.ejs -->
+<div class="card">
+    <div class="card-header">
+        <h3>Daftar Antrian Saya</h3>
+        <p class="text-muted">Daftar buku yang sedang Anda tunggu karena stok habis.</p>
+    </div>
+    
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>No. Antrian</th>
+                    <th>Tanggal Daftar</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (antrian.length > 0) { %>
+                    <% antrian.forEach(item => { %>
+                        <tr>
+                            <td>
+                                <span class="badge badge-blue">#<%= item.nomor_antrian %></span>
+                            </td>
+                            <td>
+                                <!-- Memformat tanggal agar lebih enak dibaca -->
+                                <%= new Date(item.tgl_daftar).toLocaleDateString('id-ID', { 
+                                    day: '2-digit', month: 'long', year: 'numeric' 
+                                }) %>
+                            </td>
+                            <td>
+                                <% if (item.status === 'menunggu') { %>
+                                    <span class="badge badge-orange">Menunggu Stok</span>
+                                <% } else if (item.status === 'diproses') { %>
+                                    <span class="badge badge-blue">Buku Tersedia</span>
+                                <% } else { %>
+                                    <span class="badge badge-secondary"><%= item.status %></span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="batalkanAntrian('<%= item.id %>')">Batalkan</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 20px;">
+                            <p>Anda belum memiliki antrian buku saat ini.</p>
+                            <a href="/katalog" class="btn btn-primary btn-sm">Lihat Katalog</a>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .table-wrapper { overflow-x: auto; margin-top: 15px; }
+    .table { width: 100%; border-collapse: collapse; background: white; }
+    .table th, .table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+    .table th { background-color: #f8f9fa; color: #333; font-weight: 600; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .badge-orange { background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; }
+    .badge-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .badge-secondary { background: #f3f4f6; color: #374151; }
+</style>
+</body>
+</html>

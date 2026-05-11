@@ -12,6 +12,7 @@ const path = require('path');
 const QRCode = require('qrcode');
 const crypto = require('crypto');
 
+
 // router.use(cookieParser());
 
 router.use('/static', express.static('frontend'));
@@ -51,9 +52,18 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/dashboard', auth, async (req, res) => {
-  res.render("peminjam/dashboard", {
-    user: req.user
+  const id = req.user.id;
+  const namaUser = await db.query(`SELECT nama FROM peminjam WHERE id = $1`, [id]);
+  const nama = namaUser.rows[0].nama;
+  try{
+    res.render("peminjam/dashboard", {
+    user: req.user,
+    nama
   });
+  }catch(err){
+    console.log("ERROR: ", err.message);
+  }
+  
 });
 
 // GET /api/peminjam
@@ -82,13 +92,15 @@ router.get('/', auth, async (req, res) => {
 
 // POST /api/peminjam
 router.post('/', auth, async (req, res) => {
-  const { nomor_induk, nama, tipe, kelas, email } = req.body;
-  if (!nomor_induk || !nama || !tipe)
-    return res.status(400).json({ message: 'Nomor induk, nama, dan tipe wajib diisi' });
+  const { nomor_induk, nama, tipe, kelas, email, password } = req.body;
+  if (!nomor_induk || !nama || !tipe || !password)
+    return res.status(400).json({ message: 'Nomor induk, nama, password dan tipe wajib diisi' });
   try {
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
     const { rows } = await db.query(
-      'INSERT INTO peminjam (nomor_induk,nama,tipe,kelas,email) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-      [nomor_induk, nama, tipe, kelas||null, email||null]
+      'INSERT INTO peminjam (nomor_induk,nama,tipe,kelas,email,password) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
+      [nomor_induk, nama, tipe, kelas||null, email||null, hashPassword]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -139,11 +151,11 @@ router.post('/import', auth, upload.single('file'), async (req, res) => {
   parser.on('end', async () => {
     let ok = 0, skip = 0;
     for (const r of records) {
-      if (!r.nomor_induk || !r.nama || !r.tipe) { skip++; continue; }
+      if (!r.nomor_induk || !r.nama || !r.tipe || !r.password) { skip++; continue; }
       try {
         await db.query(
-          'INSERT INTO peminjam (nomor_induk,nama,tipe,kelas,email) VALUES ($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING',
-          [r.nomor_induk, r.nama, r.tipe, r.kelas||null, r.email||null]
+          'INSERT INTO peminjam (nomor_induk,nama,tipe,kelas,email,password) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING',
+          [r.nomor_induk, r.nama, r.tipe, r.kelas||null, r.email||null, r.password]
         );
         ok++;
       } catch { skip++; }
@@ -206,7 +218,9 @@ router.get('/katalog', async (req, res) => {
       ORDER BY judul ASC
     `);
     res.render('peminjam/katalog', {
-      buku: result.rows
+      buku: result.rows,
+      results: [],
+      keyword: ''
     });
   } catch (err){
     console.log('ERROR: ', err.message);
@@ -237,6 +251,31 @@ router.get('/detail/:id', auth, async(req, res) => {
     });
   } catch (err){
     console.log('ERROR: ', err.message);
+  }
+});
+
+router.get('/searchBook', auth, async(req, res) => {
+  const keyword = req.query.q || '';
+  let results = [];
+
+  try {
+    if (keyword) {
+      const query = await db.query(
+        `SELECT * FROM buku WHERE judul ILIKE $1`,
+        [`%${keyword}%`]
+      );
+
+      results = query.rows;
+    }
+
+    res.render("peminjam/katalog", {
+      results,
+      keyword
+    });
+
+  } catch(err) {
+    console.log('ERROR: ', err.message);
+    res.send("Terjadi error");
   }
 });
 
@@ -285,6 +324,22 @@ router.get("/antrianPage/:id", auth, async(req, res) => {
     bookId: id
   })
 });
+
+router.get("/antrianSaya", auth, async(req, res) => {
+  const id = req.user.id;
+
+  try{
+    const result = await db.query(`SELECT a.id, a.tgl_daftar, a.nomor_antrian, a.status, b.judul 
+                    FROM antrian a
+                    JOIN buku b ON a.buku_id = b.id 
+                    WHERE a.peminjam_id = $1`, [id]);
+    res.render("peminjam/daftarAntrian", {
+      antrian: result.rows
+    });
+  }catch(err){
+    console.log('ERROR: ', err.message);
+  }
+})
 
 router.get("/riwayat", auth, async(req, res) => {
   const id = req.user.id;
