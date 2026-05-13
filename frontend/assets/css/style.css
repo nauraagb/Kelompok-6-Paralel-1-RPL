@@ -225,3 +225,590 @@ tr:hover td { background: var(--primary-pale); }
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
 .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ══════════════════════════════════════════════
+   PEMINJAM SPECIFIC STYLES
+   ══════════════════════════════════════════════ */
+
+/* ── Sidebar Section Label ── */
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #4B5563;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 8px 10px 4px;
+  margin-top: 4px;
+}
+
+/* ── Topbar Search ── */
+.topbar-search {
+  flex: 1;
+  max-width: 560px;
+  position: relative;
+}
+.topbar-search input {
+  width: 100%;
+  padding: 9px 14px 9px 40px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.topbar-search input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(249,115,22,.1);
+}
+.topbar-search input::placeholder { color: #9CA3AF; }
+.topbar-search-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9CA3AF;
+  pointer-events: none;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar-bell {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sm);
+  cursor: pointer;
+  transition: all .15s;
+  position: relative;
+}
+.topbar-bell:hover { background: var(--primary-lt); border-color: var(--primary-lt); color: var(--primary); }
+.topbar-bell .bell-dot {
+  position: absolute;
+  top: 6px; right: 7px;
+  width: 7px; height: 7px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: 1.5px solid white;
+}
+.topbar-user-info { text-align: right; }
+.topbar-user-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.topbar-user-role { font-size: 11px; color: var(--text-sm); }
+.topbar-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── BOOK CATALOG GRID ── */
+.katalog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.katalog-header h1 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+.katalog-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.katalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
+}
+.book-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+  display: flex;
+  flex-direction: column;
+}
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+.book-cover {
+  height: 180px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.book-cover img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.book-cover-placeholder {
+  width: 80px; height: 80px;
+  background: var(--border);
+  border-radius: 8px;
+}
+.book-info {
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.book-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.book-author {
+  font-size: 11px;
+  color: var(--text-sm);
+  font-weight: 500;
+}
+.book-category {
+  font-size: 10px;
+  color: var(--primary-dk);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.book-stock {
+  font-size: 11px;
+  color: var(--text-sm);
+  margin-top: 4px;
+}
+.book-stock strong { color: var(--success); font-weight: 700; }
+.book-actions {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+.book-actions .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── BOOK DETAIL ── */
+.detail-hero {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.detail-cover {
+  flex-shrink: 0;
+  width: 200px;
+  height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.15);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail-cover img { width: 100%; height: 100%; object-fit: cover; }
+.detail-cover-placeholder {
+  width: 80px; height: 80px;
+  background: var(--border);
+  border-radius: 8px;
+}
+.detail-meta { flex: 1; min-width: 260px; }
+.detail-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  margin-bottom: 16px;
+}
+.detail-field { display: flex; flex-direction: column; gap: 2px; }
+.detail-field-label {
+  font-size: 11px;
+  color: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.detail-field-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.detail-stock-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.detail-stock-badge.available {
+  background: #DCFCE7;
+  color: #15803D;
+}
+.detail-stock-badge.empty {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+.detail-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.stars { color: #F59E0B; font-size: 16px; }
+.rating-val { font-size: 14px; font-weight: 700; color: var(--text); }
+
+/* ── RELATED BOOKS ── */
+.related-section { margin-top: 28px; }
+.related-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.related-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.related-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+.related-thumb {
+  width: 44px; height: 54px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.related-info { flex: 1; min-width: 0; }
+.related-book-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.related-book-author {
+  font-size: 11px;
+  color: var(--text-sm);
+}
+
+/* ── FORM PEMINJAMAN ── */
+.form-peminjaman-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.form-peminjaman-left { flex: 1; min-width: 300px; }
+.form-peminjaman-right {
+  flex-shrink: 0;
+  text-align: center;
+}
+.form-book-cover {
+  width: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.15);
+  background: var(--bg);
+  height: 270px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.form-book-cover img { width: 100%; height: 100%; object-fit: cover; }
+.form-book-title-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.form-book-author-label {
+  font-size: 12px;
+  color: var(--text-sm);
+}
+
+/* ── QR CODE PAGE ── */
+.qr-alert {
+  background: #ECFDF5;
+  border: 1px solid #BBF7D0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.qr-alert-left { display: flex; align-items: center; gap: 16px; }
+.qr-alert-icon {
+  width: 52px; height: 52px;
+  background: #D1FAE5;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #065F46;
+  flex-shrink: 0;
+}
+.qr-alert-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #065F46;
+  margin-bottom: 2px;
+}
+.qr-alert-sub {
+  font-size: 12px;
+  color: #047857;
+}
+.qr-timer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1.5px solid #BBF7D0;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+}
+.qr-timer svg { color: #065F46; }
+.qr-content {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.qr-code-wrap {
+  flex-shrink: 0;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qr-code-wrap img { width: 220px; height: 220px; display: block; }
+.qr-steps {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  min-width: 240px;
+}
+.qr-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+.qr-step-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: #1E3A5F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.qr-step-num {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary-dk);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.qr-step-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+}
+.qr-step-desc {
+  font-size: 11px;
+  color: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* ── DASHBOARD PEMINJAM ── */
+.welcome-banner {
+  background: linear-gradient(135deg, var(--primary-dk) 0%, var(--primary) 60%, #FB923C 100%);
+  border-radius: 16px;
+  padding: 28px 32px;
+  color: white;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.welcome-banner h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.welcome-banner p { font-size: 13px; opacity: .85; }
+.welcome-icon { font-size: 56px; }
+
+/* ── RIWAYAT / HISTORY ── */
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.status-menunggu  { background: #FEF3C7; color: #92400E; }
+.status-dipinjam  { background: #DBEAFE; color: #1E40AF; }
+.status-dikembalikan { background: #D1FAE5; color: #065F46; }
+.status-terlambat { background: #FEE2E2; color: #991B1B; }
+.status-batal     { background: #F3F4F6; color: #6B7280; }
+
+/* ── AKUN / PROFILE ── */
+.profile-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-width: 560px;
+}
+.profile-header {
+  background: linear-gradient(135deg, #b74f00 0%, #ff6f00 100%);
+  padding: 32px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: white;
+}
+.profile-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--primary);
+  font-size: 24px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255,255,255,.3);
+  flex-shrink: 0;
+}
+.profile-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.profile-role { font-size: 12px; opacity: .8; }
+.profile-body { padding: 24px 28px; }
+.profile-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.profile-field:last-child { border-bottom: none; }
+.profile-field-label {
+  width: 140px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.profile-field-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.profile-logout-wrap {
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── ANTRIAN CONFIRM ── */
+.antrian-confirm-box {
+  max-width: 480px;
+  margin: 0 auto;
+}
+.antrian-book-info {
+  background: var(--primary-pale);
+  border: 1px solid var(--primary-lt);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-sm);
+}
+.empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: .4; }
+.empty-state h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; }
+
+/* ── PAGE TITLE ── */
+.page-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); transition: transform .3s; }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+  .katalog-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .detail-hero { flex-direction: column; }
+  .detail-cover { width: 160px; height: 220px; }
+  .qr-steps { grid-template-columns: 1fr 1fr; }
+  .related-grid { grid-template-columns: 1fr; }
+}

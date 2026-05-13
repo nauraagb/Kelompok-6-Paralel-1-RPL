@@ -1,42 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>Akun Saya</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akun Saya — Perpustakaan SMA PESAT</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
+<div class="app-layout">
+  <%- include('../partials/navbar') %>
 
-  <h2>Akun Saya</h2>
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <span class="topbar-search-icon">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </span>
+        <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
+          <input type="text" name="q" placeholder="Cari Koleksi...">
+        </form>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-user-info">
+          <div class="topbar-user-name"><%= user.nama %></div>
+          <div class="topbar-user-role"><%= user.kelas ? user.kelas + ' · ' + user.tipe : user.tipe %></div>
+        </div>
+        <div class="topbar-avatar"><%= user.nama.charAt(0).toUpperCase() %></div>
+      </div>
+    </div>
 
-  <table border="1" cellpadding="10">
-    <tr>
-      <td>Nomor Induk</td>
-      <td><%= user.nomor_induk %></td>
-    </tr>
-    <tr>
-      <td>Nama</td>
-      <td><%= user.nama %></td>
-    </tr>
-    <tr>
-      <td>Tipe</td>
-      <td><%= user.tipe %></td>
-    </tr>
-    <tr>
-      <td>Kelas</td>
-      <td><%= user.kelas || '-' %></td>
-    </tr>
-    <tr>
-      <td>Email</td>
-      <td><%= user.email || '-' %></td>
-    </tr>
-    <tr>
-      <td>Bergabung Sejak</td>
-      <td><%= new Date(user.created_at).toLocaleDateString() %></td>
-    </tr>
-  </table>
+    <!-- Page Body -->
+    <div class="page-body">
+      <h1 class="page-title">Akun Saya</h1>
 
-  <br>
+      <div class="profile-card">
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <div class="profile-avatar"><%= user.nama.charAt(0).toUpperCase() %></div>
+          <div>
+            <div class="profile-name"><%= user.nama %></div>
+            <div class="profile-role"><%= user.kelas ? user.kelas + ' · ' : '' %><%= user.tipe %></div>
+          </div>
+        </div>
 
-  <!-- <a href="/peminjam/edit-akun">Edit Profil</a> -->
-
+        <!-- Profile Fields -->
+        <div class="profile-body">
+          <div class="profile-field">
+            <div class="profile-field-label">Nomor Induk</div>
+            <div class="profile-field-value"><%= user.nomor_induk %></div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Nama Lengkap</div>
+            <div class="profile-field-value"><%= user.nama %></div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Tipe Pengguna</div>
+            <div class="profile-field-value">
+              <span class="badge badge-orange"><%= user.tipe %></span>
+            </div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Kelas</div>
+            <div class="profile-field-value"><%= user.kelas || '—' %></div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Email</div>
+            <div class="profile-field-value"><%= user.email || '—' %></div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Bergabung Sejak</div>
+            <div class="profile-field-value">
+              <%= new Date(user.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+    if (el.dataset.page === 'akun') el.classList.add('active');
+  });
+</script>
 </body>
 </html>

@@ -1,39 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Peminjaman</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riwayat Peminjaman — Perpustakaan SMA PESAT</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-    <%- include('../partials/navbar') %>
-    <h2>Riwayat Peminjaman</h2>
+<div class="app-layout">
+  <%- include('../partials/navbar') %>
 
-    <table border="1" cellpadding="10">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nama Buku</th>
-                <th>Tanggal Pengajuan</th>
-                <th>Tanggal Rencana Kembali</th>
-                <th>Tanggal Kembali Aktual</th>
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <span class="topbar-search-icon">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </span>
+        <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
+          <input type="text" name="q" placeholder="Cari Koleksi...">
+        </form>
+      </div>
+      <div class="topbar-actions">
+      </div>
+    </div>
+
+    <!-- Page Body -->
+    <div class="page-body">
+      <h1 class="page-title">Riwayat Peminjaman</h1>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Semua Transaksi</span>
+          <span class="badge badge-gray"><%= peminjaman.length %> transaksi</span>
+        </div>
+        <% if (peminjaman.length === 0) { %>
+        <div class="card-body">
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h3>Belum ada riwayat peminjaman</h3>
+            <p>Mulai pinjam buku dari katalog perpustakaan.</p>
+            <a href="/api/peminjam/katalog" class="btn btn-primary btn-sm" style="margin-top:12px;">Lihat Katalog</a>
+          </div>
+        </div>
+        <% } else { %>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Judul Buku</th>
+                <th>Tgl Pengajuan</th>
+                <th>Batas Kembali</th>
+                <th>Tgl Kembali</th>
                 <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-            <% peminjaman.forEach(row => { %>
-                <tr>
-                    <td><%= row.id %></td>
-                    <td><%= row.judul %></td>
-                    <td><%= row.tgl_pengajuan %></td>
-                    <td><%= row.tgl_kembali_rencana %></td>
-                    <td><%= row.tgl_kembali_aktual || '-' %></td>
-                    <td><%= row.status %></td>
-                </tr>
-            <% }) %>
-        </tbody>
-    </table>
-
+              </tr>
+            </thead>
+            <tbody>
+              <% peminjaman.forEach(function(row, index) { %>
+              <tr>
+                <td class="text-muted"><%= index + 1 %></td>
+                <td style="font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                  <%= row.judul %>
+                </td>
+                <td class="text-muted">
+                  <%= row.tgl_pengajuan ? new Date(row.tgl_pengajuan).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—' %>
+                </td>
+                <td class="text-muted">
+                  <%= row.tgl_kembali_rencana ? new Date(row.tgl_kembali_rencana).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—' %>
+                </td>
+                <td class="text-muted">
+                  <%= row.tgl_kembali_aktual ? new Date(row.tgl_kembali_aktual).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—' %>
+                </td>
+                <td>
+                  <% 
+                    let badgeClass = 'status-menunggu';
+                    if (row.status === 'dipinjam') badgeClass = 'status-dipinjam';
+                    else if (row.status === 'dikembalikan') badgeClass = 'status-dikembalikan';
+                    else if (row.status === 'terlambat') badgeClass = 'status-terlambat';
+                    else if (row.status === 'batal') badgeClass = 'status-batal';
+                  %>
+                  <span class="status-badge <%= badgeClass %>"><%= row.status %></span>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+    if (el.dataset.page === 'riwayat') el.classList.add('active');
+  });
+</script>
 </body>
 </html>

@@ -1,13 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Perpustakaan SMA PESAT</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-     <%- include('../partials/navbar') %>
-     
-     <h1>Halo, <%= nama %></h1>
+<div class="app-layout">
+  <%- include('../partials/navbar') %>
+
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <span class="topbar-search-icon">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </span>
+        <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
+          <input type="text" name="q" placeholder="Cari Koleksi...">
+        </form>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-user-info">
+          <div class="topbar-user-name"><%= nama %></div>
+          <div class="topbar-user-role"><%= user.kelas ? user.kelas + ' · Siswa' : 'Perpustakaan PESAT' %></div>
+        </div>
+        <div class="topbar-avatar"><%= nama.charAt(0).toUpperCase() %></div>
+      </div>
+    </div>
+
+    <!-- Page Body -->
+    <div class="page-body">
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div>
+          <h2>Halo, <%= nama %>!</h2>
+          <p>Selamat datang di Perpustakaan SMA PESAT. Temukan koleksi buku terbaik untuk kamu.</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px;">
+        <a href="/api/peminjam/katalog" style="text-decoration:none;">
+          <div class="stat-card accent" style="cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+            <div style="font-size:28px;margin-bottom:8px;">📖</div>
+            <div class="stat-label">Katalog Buku</div>
+            <div style="font-size:13px;color:var(--text-sm);margin-top:4px;">Jelajahi koleksi perpustakaan</div>
+          </div>
+        </a>
+        <a href="/api/peminjam/riwayat" style="text-decoration:none;">
+          <div class="stat-card accent" style="cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+            <div style="font-size:28px;margin-bottom:8px;">🕐</div>
+            <div class="stat-label">Riwayat Pinjaman</div>
+            <div style="font-size:13px;color:var(--text-sm);margin-top:4px;">Lihat buku yang pernah dipinjam</div>
+          </div>
+        </a>
+        <a href="/api/peminjam/antrianSaya" style="text-decoration:none;">
+          <div class="stat-card accent" style="cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+            <div style="font-size:28px;margin-bottom:8px;">⏳</div>
+            <div class="stat-label">Antrian Saya</div>
+            <div style="font-size:13px;color:var(--text-sm);margin-top:4px;">Pantau status antrian buku</div>
+          </div>
+        </a>
+        <a href="/api/peminjam/akun" style="text-decoration:none;">
+          <div class="stat-card accent" style="cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+            <div style="font-size:28px;margin-bottom:8px;">👤</div>
+            <div class="stat-label">Akun Saya</div>
+            <div style="font-size:13px;color:var(--text-sm);margin-top:4px;">Lihat dan kelola profil</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Info Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Informasi Perpustakaan</span>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:var(--radius);">
+              <div style="font-size:24px;">🕐</div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text);">Jam Operasional</div>
+                <div style="font-size:12px;color:var(--text-sm);">Sen–Jum: 07.30 – 15.30</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:var(--radius);">
+              <div style="font-size:24px;">📋</div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text);">Masa Pinjam</div>
+                <div style="font-size:12px;color:var(--text-sm);">Maksimal 7 hari per buku</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:var(--radius);">
+              <div style="font-size:24px;">📍</div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text);">Lokasi</div>
+                <div style="font-size:12px;color:var(--text-sm);">Gedung Utama, Lantai 1</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  // Set active nav item
+  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+    if (el.dataset.page === 'beranda') el.classList.add('active');
+  });
+</script>
 </body>
 </html>

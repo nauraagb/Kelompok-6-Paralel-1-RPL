@@ -6,7 +6,7 @@ const MENU = [
   { page: 'pengembalian', href: '/admin/pengembalian.html', icon: iconReturn,       label: 'Pengembalian' },
   { page: 'antrian',      href: '/admin/antrian.html',      icon: iconList,         label: 'Antrian' },
   { page: 'laporan',      href: '/admin/laporan.html',      icon: iconChart,        label: 'Laporan' },
-  { page: 'ebook',        href: '/admin/ebook.html',        icon: iconEbook,        label: 'E-Book Gutenberg' },
+  { page: 'ebook',        href: '/admin/ebook.html',        icon: iconEbook,        label: 'E-Book' },
 ];
 
 function iconDashboard() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`; }
@@ -30,7 +30,7 @@ function initSidebar(activePage) {
   document.getElementById('sidebar').innerHTML = `
     <div class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo">📚</div>
+        <div class="sidebar-logo"></div>
         <div>
           <div class="sidebar-name">Perpustakaan</div>
           <div class="sidebar-sub">SMA Pesat Bogor</div>

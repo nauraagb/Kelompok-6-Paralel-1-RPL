@@ -4,27 +4,28 @@
 CREATE DATABASE perpustakaan_sma;
 \c perpustakaan_sma;
 
--- Admin users
+-- USERS (admin)
 CREATE TABLE IF NOT EXISTS users (
-  id        SERIAL PRIMARY KEY,
-  username  VARCHAR(100) UNIQUE NOT NULL,
-  password  VARCHAR(255) NOT NULL,
-  nama      VARCHAR(200) NOT NULL,
+  id         SERIAL PRIMARY KEY,
+  username   VARCHAR(100) UNIQUE NOT NULL,
+  password   VARCHAR(255) NOT NULL,
+  nama       VARCHAR(200) NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Peminjam (siswa & guru)
+-- PEMINJAM (login pakai nomor_induk + password hash)
 CREATE TABLE IF NOT EXISTS peminjam (
-  id           SERIAL PRIMARY KEY,
-  nomor_induk  VARCHAR(50) UNIQUE NOT NULL,
-  nama         VARCHAR(200) NOT NULL,
-  tipe         VARCHAR(10) NOT NULL CHECK (tipe IN ('siswa','guru')),
-  kelas        VARCHAR(50),
-  email        VARCHAR(150),
-  created_at   TIMESTAMPTZ DEFAULT NOW()
+  id            SERIAL PRIMARY KEY,
+  nomor_induk   VARCHAR(50) UNIQUE NOT NULL,
+  password      VARCHAR(255) NOT NULL,
+  nama          VARCHAR(200) NOT NULL,
+  tipe          VARCHAR(10) NOT NULL CHECK (tipe IN ('siswa','guru')),
+  kelas         VARCHAR(50),
+  email         VARCHAR(150),
+  created_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Buku fisik
+-- BUKU
 CREATE TABLE IF NOT EXISTS buku (
   id             SERIAL PRIMARY KEY,
   judul          VARCHAR(300) NOT NULL,
@@ -33,16 +34,17 @@ CREATE TABLE IF NOT EXISTS buku (
   tahun_terbit   INTEGER,
   isbn           VARCHAR(50),
   kategori       VARCHAR(100),
-  jumlah_stok    INTEGER NOT NULL DEFAULT 1,
-  stok_tersedia  INTEGER NOT NULL DEFAULT 1,
-  created_at     TIMESTAMPTZ DEFAULT NOW()
+  jumlah_stok    INTEGER NOT NULL DEFAULT 1 CHECK (jumlah_stok >= 0),
+  stok_tersedia  INTEGER NOT NULL DEFAULT 1 CHECK (stok_tersedia >= 0),
+  created_at     TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT check_stok_valid CHECK (stok_tersedia <= jumlah_stok)
 );
 
--- Transaksi peminjaman
+-- TRANSAKSI PEMINJAMAN
 CREATE TABLE IF NOT EXISTS transaksi_peminjaman (
   id                  SERIAL PRIMARY KEY,
-  peminjam_id         INTEGER NOT NULL REFERENCES peminjam(id),
-  buku_id             INTEGER NOT NULL REFERENCES buku(id),
+  peminjam_id         INTEGER NOT NULL REFERENCES peminjam(id) ON DELETE RESTRICT,
+  buku_id             INTEGER NOT NULL REFERENCES buku(id) ON DELETE RESTRICT,
   tgl_pengajuan       DATE NOT NULL DEFAULT CURRENT_DATE,
   tgl_pinjam          DATE,
   tgl_kembali_rencana DATE,
@@ -50,29 +52,37 @@ CREATE TABLE IF NOT EXISTS transaksi_peminjaman (
   status              VARCHAR(20) NOT NULL DEFAULT 'menunggu'
                         CHECK (status IN ('menunggu','dipinjam','selesai','ditolak','dibatalkan')),
   catatan             TEXT,
-  admin_id            INTEGER REFERENCES users(id),
+  admin_id            INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  qr_token            VARCHAR(255) UNIQUE,
+  qr_expired_at       TIMESTAMPTZ,
   created_at          TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Antrian
+-- ANTRIAN
 CREATE TABLE IF NOT EXISTS antrian (
   id             SERIAL PRIMARY KEY,
-  peminjam_id    INTEGER NOT NULL REFERENCES peminjam(id),
-  buku_id        INTEGER NOT NULL REFERENCES buku(id),
+  peminjam_id    INTEGER NOT NULL REFERENCES peminjam(id) ON DELETE RESTRICT,
+  buku_id        INTEGER NOT NULL REFERENCES buku(id) ON DELETE RESTRICT,
   tgl_daftar     DATE NOT NULL DEFAULT CURRENT_DATE,
   nomor_antrian  INTEGER NOT NULL,
   status         VARCHAR(20) NOT NULL DEFAULT 'menunggu'
                    CHECK (status IN ('menunggu','diproses','dibatalkan')),
+  qr_token       VARCHAR(255) UNIQUE,
+  qr_expired_at  TIMESTAMPTZ,
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Index untuk performa
-CREATE INDEX IF NOT EXISTS idx_transaksi_status ON transaksi_peminjaman(status);
-CREATE INDEX IF NOT EXISTS idx_transaksi_peminjam ON transaksi_peminjaman(peminjam_id);
-CREATE INDEX IF NOT EXISTS idx_transaksi_buku ON transaksi_peminjaman(buku_id);
-CREATE INDEX IF NOT EXISTS idx_antrian_buku ON antrian(buku_id);
+-- INDEX
+CREATE INDEX IF NOT EXISTS idx_transaksi_status   ON transaksi_peminjaman(status);
+CREATE INDEX IF NOT EXISTS idx_transaksi_peminjam  ON transaksi_peminjaman(peminjam_id);
+CREATE INDEX IF NOT EXISTS idx_transaksi_buku      ON transaksi_peminjaman(buku_id);
+CREATE INDEX IF NOT EXISTS idx_antrian_buku        ON antrian(buku_id);
 
--- Default admin (password: admin123)
+-- DEFAULT ADMIN (password: admin123)
 INSERT INTO users (username, password, nama)
-VALUES ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Perpustakaan')
+VALUES (
+  'admin',
+  '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+  'Admin Perpustakaan'
+)
 ON CONFLICT (username) DO NOTHING;

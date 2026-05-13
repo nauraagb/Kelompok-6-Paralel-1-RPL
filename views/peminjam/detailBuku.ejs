@@ -1,27 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Buku</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= detail.judul %> — Perpustakaan SMA PESAT</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-     <%- include('../partials/navbar') %>
+<div class="app-layout">
+  <%- include('../partials/navbar') %>
 
-     <div class="detail">
-       <h1><%= detail.judul %></h1>
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <span class="topbar-search-icon">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </span>
+        <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
+          <input type="text" name="q" placeholder="Cari Koleksi...">
+        </form>
+      </div>
+      <div class="topbar-actions">
+      </div>
+    </div>
 
-        <p>ISBN: <%= detail.isbn %></p>
-        <p>Tahun Terbit: <%= detail.tahun_terbit %></p>
-        <p>Kategori: <%= detail.kategori %></p>
-        <p>Jumlah Eksemplar: <%= detail.jumlah_stok %></p>
-        <p>Stok Tersedia: <%= detail.stok_tersedia %></p>
+    <!-- Page Body -->
+    <div class="page-body">
+      <!-- Back Link -->
+      <div style="margin-bottom:20px;">
+        <a href="/api/peminjam/katalog" class="btn btn-secondary btn-sm">
+          <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+          </svg>
+          Kembali ke Katalog
+        </a>
+      </div>
 
-        <% if (detail.stok_tersedia != 0) { %>
-        <a href="/api/peminjam/formaja?id=<%= detail.id %>">Pinjam</a>
-        <% } else { %>
-        <a href="/api/peminjam/antrianPage/<%= detail.id %>">Ajukan Antrian</a>
-        <% } %>
-     </div>
+      <h1 class="page-title">Informasi Buku</h1>
+
+      <div class="detail-hero">
+        <!-- Book Cover -->
+        <div class="detail-cover">
+          <div class="detail-cover-placeholder"></div>
+        </div>
+
+        <!-- Book Meta -->
+        <div class="detail-meta">
+          <div class="detail-title"><%= detail.judul %></div>
+
+          <!-- Stock Badge -->
+          <% if (detail.stok_tersedia > 0) { %>
+          <div class="detail-stock-badge available">Stok Tersedia: <%= detail.stok_tersedia %> buku</div>
+          <% } else { %>
+          <div class="detail-stock-badge empty">Stok Habis</div>
+          <% } %>
+
+          <!-- Metadata Grid -->
+          <div class="detail-grid">
+            <div class="detail-field">
+              <span class="detail-field-label">ISBN</span>
+              <span class="detail-field-value"><%= detail.isbn || '—' %></span>
+            </div>
+            <div class="detail-field">
+              <span class="detail-field-label">Edisi</span>
+              <span class="detail-field-value">—</span>
+            </div>
+            <div class="detail-field">
+              <span class="detail-field-label">Tahun Terbit</span>
+              <span class="detail-field-value"><%= detail.tahun_terbit || '—' %></span>
+            </div>
+            <div class="detail-field">
+              <span class="detail-field-label">Bahasa</span>
+              <span class="detail-field-value">Indonesia</span>
+            </div>
+            <div class="detail-field">
+              <span class="detail-field-label">Halaman</span>
+              <span class="detail-field-value">—</span>
+            </div>
+            <div class="detail-field">
+              <span class="detail-field-label">Kategori</span>
+              <span class="detail-field-value"><%= detail.kategori || '—' %></span>
+            </div>
+            <div class="detail-field">
+              <span class="detail-field-label">Kode Rak</span>
+              <span class="detail-field-value">—</span>
+            </div>
+            <div class="detail-field">
+              <span class="detail-field-label">Jumlah Eksemplar</span>
+              <span class="detail-field-value"><%= detail.jumlah_stok %> Buku</span>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <% if (detail.stok_tersedia > 0) { %>
+          <a href="/api/peminjam/formaja?id=<%= detail.id %>" class="btn btn-primary" style="min-width:140px;justify-content:center;">
+            <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+            </svg>
+            Pinjam
+          </a>
+          <% } else { %>
+          <a href="/api/peminjam/antrianPage/<%= detail.id %>" class="btn btn-secondary" style="min-width:140px;justify-content:center;">
+            <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+            </svg>
+            Ajukan Antrian
+          </a>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Pengarang Info -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-body" style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--primary-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="color:var(--primary);">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-sm);text-transform:uppercase;letter-spacing:.04em;">Pengarang</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);"><%= detail.pengarang || '—' %></div>
+          </div>
+          <% if (detail.penerbit) { %>
+          <div style="margin-left:24px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text-sm);text-transform:uppercase;letter-spacing:.04em;">Penerbit</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);"><%= detail.penerbit %></div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+    if (el.dataset.page === 'katalog') el.classList.add('active');
+  });
+</script>
 </body>
 </html>

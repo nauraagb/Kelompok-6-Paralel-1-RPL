@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Book — Perpustakaan SMA PESAT</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="#F97316"/>
+          <path d="M16 6C16 6 8 10 8 18C8 22.418 11.582 26 16 26C20.418 26 24 22.418 24 18C24 10 16 6 16 6Z" fill="white" fill-opacity="0.9"/>
+          <path d="M16 10C16 10 11 13 11 18C11 20.761 13.239 23 16 23C18.761 23 21 20.761 21 18C21 13 16 10 16 10Z" fill="#F97316"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-name">SMA PESAT</div>
+        <div class="sidebar-sub">School of Talent</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Menu Utama</div>
+      <a href="/api/peminjam/dashboard" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        Beranda
+      </a>
+      <a href="/api/peminjam/katalog" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+        Katalog
+      </a>
+      <a href="/peminjam/ebook.html" class="nav-item active">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z" clip-rule="evenodd"/></svg>
+        E-Book
+      </a>
+      <a href="/api/peminjam/antrianSaya" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+        Antrian
+      </a>
+      <a href="/api/peminjam/riwayat" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+        Riwayat
+      </a>
+      <a href="/api/peminjam/akun" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+        Akun
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="topbar-avatar" id="sidebar-avatar" style="width:32px;height:32px;font-size:12px;">U</div>
+          <div>
+            <div class="sidebar-user-name" id="sidebar-name">Pengguna</div>
+            <div class="sidebar-user-role">Perpustakaan PESAT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <span class="topbar-search-icon">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </span>
+        <input type="text" id="q" placeholder="Cari judul atau pengarang e-book..." onkeydown="if(event.key==='Enter') doSearch(1)">
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-user-info" id="topbar-userinfo" style="display:none">
+          <div class="topbar-user-name" id="topbar-name"></div>
+          <div class="topbar-user-role" id="topbar-role"></div>
+        </div>
+        <div class="topbar-avatar" id="topbar-avatar">U</div>
+      </div>
+    </div>
+
+    <!-- Page Body -->
+    <div class="page-body">
+
+      <!-- Header + Filter Bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h1 class="page-title" style="margin-bottom:4px;">E-Book</h1>
+          <p class="text-muted text-sm">Koleksi gratis dari Project Gutenberg — bisa dibaca & diunduh langsung</p>
+        </div>
+        <span class="badge badge-green" style="font-size:12px;padding:6px 12px;">Open Source · Gratis</span>
+      </div>
+
+      <!-- Search + Filter Card -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-body">
+          <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+            <div class="form-group flex-1" style="margin-bottom:0;min-width:200px;">
+              <label class="form-label">Kata Kunci</label>
+              <input id="q2" type="text" class="form-control" placeholder="Contoh: Sherlock Holmes, Pride and Prejudice…"
+                onkeydown="if(event.key==='Enter') { document.getElementById('q').value=this.value; doSearch(1); }">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Bahasa</label>
+              <select id="lang" class="form-control" style="width:140px;">
+                <option value="">Semua</option>
+                <option value="en">Inggris</option>
+                <option value="id">Indonesia</option>
+                <option value="fr">Perancis</option>
+                <option value="de">Jerman</option>
+                <option value="es">Spanyol</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="syncAndSearch()">
+              <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+              </svg>
+              Cari E-Book
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search info -->
+      <div id="search-info" class="text-muted text-sm" style="margin-bottom:14px;"></div>
+
+      <!-- Grid -->
+      <div id="ebook-grid" class="ebook-grid"></div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination" style="margin-top:24px;"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Detail -->
+<div class="modal-backdrop" id="detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="detail-title">Detail E-Book</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentPage = 1;
+
+  // ── Sync search inputs ──────────────────────────────────────────
+  function syncAndSearch() {
+    document.getElementById('q').value = document.getElementById('q2').value;
+    doSearch(1);
+  }
+  document.getElementById('q2').addEventListener('input', function() {
+    document.getElementById('q').value = this.value;
+  });
+
+  // ── Fetch with cookie auth ──────────────────────────────────────
+  async function apiFetch(url) {
+    const res = await fetch(url, { credentials: 'include' });
+    if (res.status === 401) {
+      window.location.href = '/peminjam/login';
+      return null;
+    }
+    return res;
+  }
+
+  // ── Search ──────────────────────────────────────────────────────
+  async function doSearch(page = 1) {
+    currentPage = page;
+    const q    = document.getElementById('q').value.trim();
+    const lang = document.getElementById('lang').value;
+    const grid = document.getElementById('ebook-grid');
+
+    grid.innerHTML = `
+      <div class="loading-overlay" style="grid-column:1/-1">
+        <div class="spinner"></div>
+      </div>`;
+    document.getElementById('search-info').textContent = '';
+    document.getElementById('pagination').innerHTML = '';
+
+    const params = new URLSearchParams({ page });
+    if (q)    params.append('q', q);
+    if (lang) params.append('lang', lang);
+
+    const res = await apiFetch(`/api/ebook/search?${params}`);
+    if (!res) return;
+    const data = await res.json();
+
+    if (!res.ok) {
+      grid.innerHTML = `<div class="alert alert-error" style="grid-column:1/-1">${data.message}</div>`;
+      return;
+    }
+
+    document.getElementById('search-info').textContent =
+      `Ditemukan ${Number(data.total).toLocaleString('id-ID')} e-book di Project Gutenberg${q ? ` untuk "${q}"` : ''}`;
+
+    if (!data.data.length) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-state-icon">📚</div>
+          <h3>Tidak ada e-book ditemukan</h3>
+          <p>Coba kata kunci atau bahasa yang berbeda.</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = data.data.map(b => {
+      const links  = Object.entries(b.download).filter(([, url]) => url);
+      const dlBtns = links.map(([fmt, url]) =>
+        `<a href="${url}" target="_blank" class="btn btn-primary btn-sm">⬇ ${fmt.toUpperCase()}</a>`
+      ).join('');
+      return `
+        <div class="ebook-card">
+          <div class="ebook-cover" onclick="showDetail(${b.id})" style="cursor:pointer;">
+            ${b.cover
+              ? `<img src="${b.cover}" alt="${escHtml(b.judul)}" loading="lazy">`
+              : `<span class="ebook-cover-placeholder">📖</span>`}
+          </div>
+          <div class="ebook-info">
+            <div class="ebook-title" title="${escHtml(b.judul)}">${escHtml(b.judul)}</div>
+            <div class="ebook-author">${escHtml(b.pengarang)}</div>
+            <div class="ebook-langs">${b.bahasa} · ${Number(b.unduhan).toLocaleString('id-ID')} unduhan</div>
+          </div>
+          <div class="ebook-actions">
+            ${dlBtns || '<span class="text-muted text-sm">Tidak ada link unduhan</span>'}
+          </div>
+        </div>`;
+    }).join('');
+
+    renderPagination(Math.min(data.total, 1000), page, 32);
+  }
+
+  // ── Detail Modal ────────────────────────────────────────────────
+  async function showDetail(id) {
+    document.getElementById('detail-modal').classList.add('open');
+    document.getElementById('detail-title').textContent = 'Memuat…';
+    document.getElementById('detail-body').innerHTML =
+      '<div class="loading-overlay"><div class="spinner"></div></div>';
+
+    const res = await apiFetch(`/api/ebook/${id}`);
+    if (!res) return;
+    const b = await res.json();
+
+    if (!res.ok) {
+      document.getElementById('detail-body').innerHTML =
+        `<div class="alert alert-error">${b.message}</div>`;
+      return;
+    }
+
+    document.getElementById('detail-title').textContent = b.judul;
+
+    const links  = Object.entries(b.download).filter(([, url]) => url);
+    const dlBtns = links.map(([fmt, url]) =>
+      `<a href="${url}" target="_blank" class="btn btn-primary">⬇ Download ${fmt.toUpperCase()}</a>`
+    ).join('');
+
+    document.getElementById('detail-body').innerHTML = `
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div style="flex-shrink:0;">
+          ${b.cover
+            ? `<img src="${b.cover}" style="width:140px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);">`
+            : `<div style="width:140px;height:200px;background:var(--primary-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:48px;">📖</div>`}
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <h3 style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--text);">${escHtml(b.judul)}</h3>
+          <p class="text-muted" style="margin-bottom:14px;">${escHtml(b.pengarang)}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+            <span class="badge badge-orange">${b.bahasa}</span>
+            <span class="badge badge-gray">${Number(b.unduhan).toLocaleString('id-ID')} unduhan</span>
+          </div>
+          ${b.subjek && b.subjek.length
+            ? `<div style="margin-bottom:16px;">
+                <div class="form-label" style="margin-bottom:6px;">Subjek</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                  ${b.subjek.slice(0,5).map(s => `<span class="badge badge-blue">${escHtml(s)}</span>`).join('')}
+                </div>
+              </div>`
+            : ''}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${dlBtns || '<span class="text-muted">Tidak ada link unduhan tersedia</span>'}
+          </div>
+          <p class="text-muted" style="margin-top:14px;font-size:11px;">
+            Sumber: <a href="https://www.gutenberg.org/ebooks/${b.id}" target="_blank"
+              style="color:var(--primary);font-weight:600;">Project Gutenberg #${b.id}</a>
+          </p>
+        </div>
+      </div>`;
+  }
+
+  function closeModal() {
+    document.getElementById('detail-modal').classList.remove('open');
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('detail-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── Pagination ──────────────────────────────────────────────────
+  function renderPagination(total, page, limit) {
+    const el    = document.getElementById('pagination');
+    const pages = Math.ceil(total / limit);
+    if (pages <= 1) { el.innerHTML = ''; return; }
+    let html = `<span class="text-muted text-sm" style="margin-right:4px;">${total.toLocaleString('id-ID')} total</span>`;
+    html += `<button class="page-btn" ${page<=1?'disabled':''} onclick="doSearch(${page-1})">‹</button>`;
+    for (let i = 1; i <= pages; i++) {
+      if (pages > 7 && Math.abs(i - page) > 2 && i !== 1 && i !== pages) {
+        if (i === 2 || i === pages - 1) html += `<span class="text-muted" style="padding:0 4px;">…</span>`;
+        continue;
+      }
+      html += `<button class="page-btn ${i===page?'active':''}" onclick="doSearch(${i})">${i}</button>`;
+    }
+    html += `<button class="page-btn" ${page>=pages?'disabled':''} onclick="doSearch(${page+1})">›</button>`;
+    el.innerHTML = html;
+  }
+
+  // ── HTML escape ─────────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Load on start ───────────────────────────────────────────────
+  doSearch(1);
+</script>
+</body>
+</html>

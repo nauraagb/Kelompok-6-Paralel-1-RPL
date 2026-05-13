@@ -1,13 +1,82 @@
-<div class="sidebar">
-  <h2 class="logo">Perpustakaan</h2>
+<aside class="sidebar" id="peminjam-sidebar">
+  <!-- Logo / Header -->
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="8" fill="#F97316"/>
+        <path d="M16 6C16 6 8 10 8 18C8 22.418 11.582 26 16 26C20.418 26 24 22.418 24 18C24 10 16 6 16 6Z" fill="white" fill-opacity="0.9"/>
+        <path d="M16 10C16 10 11 13 11 18C11 20.761 13.239 23 16 23C18.761 23 21 20.761 21 18C21 13 16 10 16 10Z" fill="#F97316"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sidebar-name">SMA PESAT</div>
+      <div class="sidebar-sub">School of Talent</div>
+    </div>
+  </div>
 
-  <a href="/api/peminjam/dashboard">Beranda</a>
-  <a href="/api/peminjam/katalog">Katalog</a>
-  <a href="/api/peminjam/antrianSaya">Antrian</a>
-  <a href="/api/peminjam/riwayat">Riwayat</a>
-  <a href="/api/peminjam/akun">Akun</a>
-</div>
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Menu Utama</div>
 
-<div class="content">
- 
-</div>
+    <a href="/api/peminjam/dashboard" class="nav-item" data-page="beranda">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+      </svg>
+      Beranda
+    </a>
+
+    <a href="/api/peminjam/katalog" class="nav-item" data-page="katalog">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+      </svg>
+      Katalog
+    </a>
+
+    <a href="/peminjam/ebook.html" class="nav-item" data-page="ebook">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z" clip-rule="evenodd"/>
+      </svg>
+      E-Book
+    </a>
+
+    <a href="/api/peminjam/antrianSaya" class="nav-item" data-page="antrian">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+      </svg>
+      Antrian
+    </a>
+
+    <a href="/api/peminjam/riwayat" class="nav-item" data-page="riwayat">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+      </svg>
+      Riwayat
+    </a>
+
+    <a href="/api/peminjam/akun" class="nav-item" data-page="akun">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+      </svg>
+      Akun
+    </a>
+  </nav>
+
+  <!-- Footer / User Info -->
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="topbar-avatar" style="width:32px;height:32px;font-size:12px;">
+          <%= typeof nama !== 'undefined' ? nama.charAt(0).toUpperCase() : (typeof user !== 'undefined' && user.nama ? user.nama.charAt(0).toUpperCase() : 'U') %>
+        </div>
+        <div>
+          <div class="sidebar-user-name">
+            <%= typeof nama !== 'undefined' ? nama : (typeof user !== 'undefined' && user.nama ? user.nama : 'Pengguna') %>
+          </div>
+          <div class="sidebar-user-role">
+            <%= typeof user !== 'undefined' && user.kelas ? user.kelas + ' · Siswa' : 'Perpustakaan PESAT' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>

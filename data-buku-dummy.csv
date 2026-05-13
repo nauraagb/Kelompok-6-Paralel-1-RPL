@@ -1,0 +1,102 @@
+judul,pengarang,penerbit,tahun_terbit,isbn,kategori,jumlah_stok
+Matematika Wajib Kelas X,Sukino,Erlangga,2022,978-602-298-101-1,Matematika,4
+Matematika Wajib Kelas XI,Sukino,Erlangga,2022,978-602-298-102-8,Matematika,3
+Matematika Wajib Kelas XII,Sukino,Erlangga,2022,978-602-298-103-5,Matematika,3
+Fisika Untuk SMA Kelas X,Marthen Kanginan,Erlangga,2021,978-602-298-201-8,Fisika,3
+Fisika Untuk SMA Kelas XI,Marthen Kanginan,Erlangga,2021,978-602-298-202-5,Fisika,3
+Fisika Untuk SMA Kelas XII,Marthen Kanginan,Erlangga,2021,978-602-298-203-2,Fisika,2
+Kimia Dasar Jilid 1,Raymond Chang,Erlangga,2020,978-602-298-301-5,Kimia,3
+Kimia Dasar Jilid 2,Raymond Chang,Erlangga,2020,978-602-298-302-2,Kimia,3
+Kimia SMA Kelas XI,Unggul Sudarmo,Erlangga,2021,978-602-298-303-9,Kimia,2
+Biologi Untuk SMA Kelas X,D.A. Pratiwi,Erlangga,2022,978-602-298-401-2,Biologi,4
+Biologi Untuk SMA Kelas XI,D.A. Pratiwi,Erlangga,2022,978-602-298-402-9,Biologi,3
+Biologi Untuk SMA Kelas XII,D.A. Pratiwi,Erlangga,2022,978-602-298-403-6,Biologi,3
+Bahasa Indonesia Ekspresi Diri Kelas X,Maryanto,Kemendikbud,2021,978-602-427-101-4,Bahasa Indonesia,5
+Bahasa Indonesia Ekspresi Diri Kelas XI,Maryanto,Kemendikbud,2021,978-602-427-102-1,Bahasa Indonesia,4
+Bahasa Indonesia Ekspresi Diri Kelas XII,Maryanto,Kemendikbud,2021,978-602-427-103-8,Bahasa Indonesia,4
+Bahasa Inggris Kelas X,Th. M. Sudarwati,Erlangga,2022,978-602-298-501-9,Bahasa Inggris,4
+Bahasa Inggris Kelas XI,Th. M. Sudarwati,Erlangga,2022,978-602-298-502-6,Bahasa Inggris,3
+Bahasa Inggris Kelas XII,Th. M. Sudarwati,Erlangga,2022,978-602-298-503-3,Bahasa Inggris,3
+Sejarah Indonesia Kelas X,Restu Gunawan,Kemendikbud,2021,978-602-427-201-1,Sejarah,4
+Sejarah Indonesia Kelas XI,Restu Gunawan,Kemendikbud,2021,978-602-427-202-8,Sejarah,3
+Sejarah Indonesia Kelas XII,Restu Gunawan,Kemendikbud,2021,978-602-427-203-5,Sejarah,3
+Geografi Kelas X,Eni Anjayani,Erlangga,2022,978-602-298-601-6,Geografi,3
+Geografi Kelas XI,Eni Anjayani,Erlangga,2022,978-602-298-602-3,Geografi,3
+Ekonomi Kelas X,Alam S.,Erlangga,2022,978-602-298-701-3,Ekonomi,4
+Ekonomi Kelas XI,Alam S.,Erlangga,2022,978-602-298-702-0,Ekonomi,3
+Ekonomi Kelas XII,Alam S.,Erlangga,2022,978-602-298-703-7,Ekonomi,3
+Sosiologi Kelas X,Kun Maryati,Erlangga,2021,978-602-298-801-0,Sosiologi,3
+Sosiologi Kelas XI,Kun Maryati,Erlangga,2021,978-602-298-802-7,Sosiologi,3
+Pendidikan Pancasila dan Kewarganegaraan Kelas X,Lukman Surya Saputra,Kemendikbud,2021,978-602-427-301-8,PKN,4
+Pendidikan Pancasila dan Kewarganegaraan Kelas XI,Lukman Surya Saputra,Kemendikbud,2021,978-602-427-302-5,PKN,3
+Pendidikan Agama Islam Kelas X,Mustahdi,Kemendikbud,2021,978-602-427-401-5,Agama,4
+Seni Budaya Kelas X,Sem Cornelyus Bangun,Erlangga,2022,978-602-298-901-4,Seni Budaya,3
+Prakarya dan Kewirausahaan Kelas X,Hendriana Mieke,Kemendikbud,2021,978-602-427-501-2,Prakarya,3
+Pendidikan Jasmani Olahraga Kelas X,Muhajir,Erlangga,2021,978-602-298-001-4,Olahraga,3
+Informatika Kelas X,Eko Budi Utomo,Kemendikbud,2022,978-602-427-601-9,Informatika,4
+Informatika Kelas XI,Eko Budi Utomo,Kemendikbud,2022,978-602-427-602-6,Informatika,3
+Pemrograman Dasar,Ridwan Sanjaya,Elex Media,2020,978-602-045-101-3,Informatika,2
+Algoritma dan Pemrograman,Rinaldi Munir,Informatika,2021,978-602-101-201-0,Informatika,2
+Bumi,Tere Liye,Gramedia,2019,978-602-03-5101-2,Fiksi,5
+Bulan,Tere Liye,Gramedia,2019,978-602-03-5102-9,Fiksi,4
+Matahari,Tere Liye,Gramedia,2019,978-602-03-5103-6,Fiksi,4
+Hujan,Tere Liye,Gramedia,2019,978-602-03-5104-3,Fiksi,5
+Hafalan Shalat Delisa,Tere Liye,Republika,2020,978-602-573-101-4,Fiksi,3
+Laskar Pelangi,Andrea Hirata,Bentang Pustaka,2018,978-602-291-101-7,Fiksi,5
+Sang Pemimpi,Andrea Hirata,Bentang Pustaka,2018,978-602-291-102-4,Fiksi,4
+Edensor,Andrea Hirata,Bentang Pustaka,2018,978-602-291-103-1,Fiksi,4
+Maryamah Karpov,Andrea Hirata,Bentang Pustaka,2018,978-602-291-104-8,Fiksi,3
+Negeri 5 Menara,Ahmad Fuadi,Gramedia,2019,978-602-03-5201-9,Fiksi,5
+Ranah 3 Warna,Ahmad Fuadi,Gramedia,2019,978-602-03-5202-6,Fiksi,4
+Rantau 1 Muara,Ahmad Fuadi,Gramedia,2019,978-602-03-5203-3,Fiksi,4
+Dilan 1990,Pidi Baiq,Pastel Books,2018,978-602-385-101-6,Fiksi,4
+Perahu Kertas,Dewi Lestari,Bentang Pustaka,2018,978-602-291-201-4,Fiksi,3
+Supernova: Ksatria Putri dan Bintang Jatuh,Dewi Lestari,Bentang Pustaka,2019,978-602-291-202-1,Fiksi,3
+Filosofi Kopi,Dewi Lestari,Bentang Pustaka,2019,978-602-291-203-8,Fiksi,4
+5 cm,Donny Dhirgantoro,Grasindo,2019,978-602-251-101-5,Fiksi,4
+Ayat-Ayat Cinta,Habiburrahman El Shirazy,Republika,2019,978-602-573-201-1,Fiksi,4
+Bumi Cinta,Habiburrahman El Shirazy,Republika,2019,978-602-573-202-8,Fiksi,3
+Harry Potter dan Batu Bertuah,J.K. Rowling,Gramedia,2019,978-602-03-5301-6,Fiksi,3
+Harry Potter dan Kamar Rahasia,J.K. Rowling,Gramedia,2019,978-602-03-5302-3,Fiksi,3
+Harry Potter dan Tahanan Azkaban,J.K. Rowling,Gramedia,2019,978-602-03-5303-0,Fiksi,2
+The Alchemist,Paulo Coelho,Gramedia,2020,978-602-03-5401-3,Fiksi,4
+Atomic Habits,James Clear,Gramedia,2021,978-602-03-5501-0,Pengembangan Diri,5
+The Power of Now,Eckhart Tolle,Gramedia,2020,978-602-03-5502-7,Pengembangan Diri,3
+Rich Dad Poor Dad,Robert Kiyosaki,Gramedia,2020,978-602-03-5503-4,Pengembangan Diri,4
+7 Habits of Highly Effective People,Stephen Covey,Binarupa Aksara,2020,978-602-101-301-7,Pengembangan Diri,3
+Mindset: The New Psychology of Success,Carol S. Dweck,Gramedia,2021,978-602-03-5504-1,Pengembangan Diri,3
+Ikigai: Rahasia Hidup Bahagia Orang Jepang,Hector Garcia,Gramedia,2021,978-602-03-5505-8,Pengembangan Diri,4
+Deep Work,Cal Newport,Gramedia,2021,978-602-03-5506-5,Pengembangan Diri,3
+Sapiens: Riwayat Singkat Umat Manusia,Yuval Noah Harari,Kepustakaan Populer Gramedia,2021,978-602-481-101-4,Pengetahuan Umum,4
+Homo Deus,Yuval Noah Harari,Kepustakaan Populer Gramedia,2021,978-602-481-102-1,Pengetahuan Umum,3
+21 Pelajaran untuk Abad ke-21,Yuval Noah Harari,Kepustakaan Populer Gramedia,2021,978-602-481-103-8,Pengetahuan Umum,3
+A Brief History of Time,Stephen Hawking,Gramedia,2020,978-602-03-5601-2,Sains,3
+The Selfish Gene,Richard Dawkins,Kepustakaan Populer Gramedia,2020,978-602-481-201-1,Sains,2
+Cosmos,Carl Sagan,Kepustakaan Populer Gramedia,2020,978-602-481-202-8,Sains,2
+Kalkulus Jilid 1,James Stewart,Erlangga,2020,978-602-298-001-7,Matematika,2
+Kalkulus Jilid 2,James Stewart,Erlangga,2020,978-602-298-002-4,Matematika,2
+Pengantar Statistika,Ronald E. Walpole,Gramedia,2020,978-602-03-5701-9,Matematika,2
+Pemrograman Web dengan PHP & MySQL,Agus Saputra,Lokomedia,2021,978-602-201-101-8,Informatika,3
+Dasar-Dasar Jaringan Komputer,Forouzan,Salemba Teknika,2020,978-602-361-101-5,Informatika,2
+Kecerdasan Buatan,Sri Kusumadewi,Graha Ilmu,2021,978-602-262-101-2,Informatika,2
+Pengantar Ekonomi Mikro,N. Gregory Mankiw,Erlangga,2021,978-602-298-701-6,Ekonomi,3
+Pengantar Ekonomi Makro,N. Gregory Mankiw,Erlangga,2021,978-602-298-702-3,Ekonomi,3
+Akuntansi Keuangan Menengah,Kieso Weygandt,Erlangga,2020,978-602-298-801-3,Ekonomi,2
+Pengantar Ilmu Hukum,C.S.T. Kansil,Pradnya Paramita,2020,978-602-321-101-9,Sosial,2
+Sosiologi Suatu Pengantar,Soerjono Soekanto,Rajawali Pers,2021,978-602-425-101-6,Sosiologi,3
+Pengantar Ilmu Politik,Miriam Budiardjo,Gramedia,2021,978-602-03-5801-6,Sosial,3
+Psikologi Umum,Robert S. Feldman,Salemba Humanika,2020,978-602-361-201-2,Psikologi,3
+Psikologi Perkembangan,Elizabeth B. Hurlock,Erlangga,2020,978-602-298-901-7,Psikologi,2
+Pengantar Psikologi Pendidikan,Syaiful Bahri Djamarah,Rineka Cipta,2021,978-602-318-101-3,Psikologi,2
+Sejarah Peradaban Islam,Badri Yatim,Rajawali Pers,2021,978-602-425-201-3,Sejarah,3
+Atlas Sejarah Indonesia,Gambar & Peta,Depdiknas,2021,978-602-427-701-6,Sejarah,2
+Ensiklopedia Sains untuk Pelajar,Tim Penulis,Erlangga,2021,978-602-298-011-3,Pengetahuan Umum,3
+Kamus Besar Bahasa Indonesia Edisi V,Tim Penyusun KBBI,Balai Pustaka,2022,978-602-090-101-0,Referensi,2
+Tesaurus Bahasa Indonesia,Eko Endarmoko,Gramedia,2022,978-602-03-5901-3,Referensi,2
+Oxford Advanced Learner's Dictionary,A.S. Hornby,Oxford University Press,2022,978-019-479-901-2,Referensi,2
+Kamus Inggris-Indonesia Indonesia-Inggris,John M. Echols,Gramedia,2021,978-602-03-5011-4,Referensi,3
+Cerpen-Cerpen Pilihan Kompas 2022,Berbagai Penulis,Kompas,2022,978-602-412-101-8,Sastra,2
+Kumpulan Puisi Chairil Anwar,Chairil Anwar,Gramedia,2021,978-602-03-6001-4,Sastra,3
+Tenggelamnya Kapal Van der Wijck,Hamka,Bulan Bintang,2020,978-602-214-101-5,Sastra,3
+Siti Nurbaya,Marah Rusli,Balai Pustaka,2020,978-602-090-201-7,Sastra,3
+Ronggeng Dukuh Paruk,Ahmad Tohari,Gramedia,2020,978-602-03-6002-1,Sastra,3

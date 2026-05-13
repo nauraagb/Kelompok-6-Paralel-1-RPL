@@ -1,38 +1,216 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Peminjaman</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajukan Peminjaman — Perpustakaan SMA PESAT</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-    <!-- SIDE NAVBAR DI SINI -->
-    <p id="namaBuku"></p>
-    <form action="/api/peminjam/ajukanPinjaman" method="POST">
-        Tanggal Pengembalian Rencana:
-        <input type="date" name="tanggalKembaliExpected" required>
+<div class="app-layout">
 
-        <input type="hidden" name="idBuku" id="idBuku">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="peminjam-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="#F97316"/>
+          <path d="M16 6C16 6 8 10 8 18C8 22.418 11.582 26 16 26C20.418 26 24 22.418 24 18C24 10 16 6 16 6Z" fill="white" fill-opacity="0.9"/>
+          <path d="M16 10C16 10 11 13 11 18C11 20.761 13.239 23 16 23C18.761 23 21 20.761 21 18C21 13 16 10 16 10Z" fill="#F97316"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-name">SMA PESAT</div>
+        <div class="sidebar-sub">School of Talent</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Menu Utama</div>
+      <a href="/api/peminjam/dashboard" class="nav-item" data-page="beranda">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        Beranda
+      </a>
+      <a href="/api/peminjam/katalog" class="nav-item active" data-page="katalog">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+        Katalog
+      </a>
+      <a href="/peminjam/ebook.html" class="nav-item" data-page="ebook">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z" clip-rule="evenodd"/></svg>
+        E-Book
+      </a>
+      <a href="/api/peminjam/antrianSaya" class="nav-item" data-page="antrian">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+        Antrian
+      </a>
+      <a href="/api/peminjam/riwayat" class="nav-item" data-page="riwayat">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+        Riwayat
+      </a>
+      <a href="/api/peminjam/akun" class="nav-item" data-page="akun">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+        Akun
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="topbar-avatar" id="sidebar-avatar" style="width:32px;height:32px;font-size:12px;">U</div>
+          <div>
+            <div class="sidebar-user-name" id="sidebar-name">Memuat...</div>
+            <div class="sidebar-user-role" id="sidebar-role">Perpustakaan PESAT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
 
-        <button type="submit">Ajukan</button>
-    </form>
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <span class="topbar-search-icon">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </span>
+        <input type="text" placeholder="Cari Koleksi..." id="search-input">
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-user-info">
+          <div class="topbar-user-name" id="topbar-name">—</div>
+          <div class="topbar-user-role" id="topbar-role">Siswa</div>
+        </div>
+        <div class="topbar-avatar" id="topbar-avatar">U</div>
+      </div>
+    </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
+    <!-- Page Body -->
+    <div class="page-body">
+      <!-- Back -->
+      <div style="margin-bottom:20px;">
+        <a id="back-link" href="/api/peminjam/katalog" class="btn btn-secondary btn-sm">
+          <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+          </svg>
+          Kembali ke Katalog
+        </a>
+      </div>
 
-        if (!id) {
-            alert("ID buku tidak ditemukan di URL");
-        }
+      <h1 class="page-title">Ajukan Peminjaman</h1>
 
-        document.getElementById('idBuku').value = id;
+      <div class="form-peminjaman-layout">
+        <!-- Form Left -->
+        <div class="form-peminjaman-left">
+          <form action="/api/peminjam/ajukanPinjaman" method="POST" id="form-pinjam">
+            <input type="hidden" name="idBuku" id="idBuku">
 
-        fetch(`/api/buku/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('namaBuku').innerText = data.judul;
-            })
-            .catch(err => console.log("Error fetch buku:", err));
-    </script>
+            <div class="form-group">
+              <label class="form-label">Nama</label>
+              <input type="text" class="form-control" id="nama-display" placeholder="Memuat nama..." readonly style="background:var(--bg);cursor:not-allowed;">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tanggal Peminjaman</label>
+              <input type="date" class="form-control" id="tgl-pinjam" readonly style="background:var(--bg);cursor:not-allowed;">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tanggal Pengembalian</label>
+              <input type="date" class="form-control" name="tanggalKembaliExpected" id="tgl-kembali" required>
+              <div class="form-hint">Maksimal 7 hari dari tanggal peminjaman</div>
+            </div>
+
+            <!-- Error message -->
+            <div id="form-error" class="alert alert-error" style="display:none;"></div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;">
+              <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              Ajukan
+            </button>
+          </form>
+        </div>
+
+        <!-- Book Info Right -->
+        <div class="form-peminjaman-right">
+          <div class="form-book-cover" id="book-cover-wrap">
+            <div style="width:80px;height:80px;background:var(--border);border-radius:8px;"></div>
+          </div>
+          <div class="form-book-title-label" id="book-title">Memuat...</div>
+          <div class="form-book-author-label" id="book-author"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Get book ID from URL
+  const params = new URLSearchParams(window.location.search);
+  const bookId = params.get('id');
+
+  if (!bookId) {
+    alert('ID buku tidak ditemukan di URL');
+    window.location.href = '/api/peminjam/katalog';
+  }
+
+  // Set hidden field
+  document.getElementById('idBuku').value = bookId;
+  document.getElementById('back-link').href = `/api/peminjam/detail/${bookId}`;
+
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('tgl-pinjam').value = today;
+
+  // Set max return date (7 days from today)
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 7);
+  const tglKembali = document.getElementById('tgl-kembali');
+  tglKembali.min = today;
+  tglKembali.max = maxDate.toISOString().split('T')[0];
+  tglKembali.value = maxDate.toISOString().split('T')[0];
+
+  // Fetch book data
+  fetch(`/api/buku/${bookId}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('book-title').textContent = data.judul || 'Buku';
+      document.getElementById('book-author').textContent = data.pengarang || '';
+    })
+    .catch(() => {
+      document.getElementById('book-title').textContent = 'Buku';
+    });
+
+  // Fetch user info from dashboard endpoint
+  fetch('/api/peminjam/dashboard', { redirect: 'manual' })
+    .catch(() => {});
+
+  // Try to get user info from cookie/session via a profile endpoint
+  fetch('/api/peminjam/akun')
+    .then(res => {
+      if (!res.ok) throw new Error('Not logged in');
+      return res.text();
+    })
+    .then(html => {
+      // Parse nama from the page if available - fallback to generic
+    })
+    .catch(() => {});
+
+  // Validate max 7 days
+  tglKembali.addEventListener('change', function() {
+    const selected = new Date(this.value);
+    const todayDate = new Date(today);
+    const diff = (selected - todayDate) / (1000*60*60*24);
+    if (diff > 7) {
+      document.getElementById('form-error').style.display = 'flex';
+      document.getElementById('form-error').textContent = 'Tanggal pengembalian maksimal 7 hari dari hari ini.';
+      this.value = maxDate.toISOString().split('T')[0];
+    } else {
+      document.getElementById('form-error').style.display = 'none';
+    }
+  });
+</script>
 </body>
 </html>

@@ -1,19 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajukan Antrian — Perpustakaan SMA PESAT</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-    <div>
-        <h1>Ajukan Antrian?</h1>
+<div class="app-layout">
+  <%- include('../partials/navbar') %>
 
-        <form action="/api/peminjam/antri/<%= bookId %>" method="POST">
-        <button type="submit">Ajukan</button>
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <span class="topbar-search-icon">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </span>
+        <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
+          <input type="text" name="q" placeholder="Cari Koleksi...">
         </form>
-
-        <a href="/api/peminjam/katalog">Batal</a>
+      </div>
     </div>
+
+    <!-- Page Body -->
+    <div class="page-body">
+      <div style="max-width: 500px; margin: 0 auto;">
+        <!-- Back -->
+        <div style="margin-bottom:20px;">
+          <a href="/api/peminjam/katalog" class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+            </svg>
+            Kembali ke Katalog
+          </a>
+        </div>
+
+        <h1 class="page-title">Ajukan Antrian</h1>
+
+        <!-- Info Box -->
+        <div class="alert alert-info" style="margin-bottom:24px;">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0;margin-top:1px;">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+          </svg>
+          Stok buku sedang habis. Kamu bisa mendaftar antrian dan akan diberitahu ketika buku tersedia.
+        </div>
+
+        <!-- Confirm Card -->
+        <div class="card">
+          <div class="card-body" style="text-align:center;padding:40px 28px;">
+            <div style="font-size:56px;margin-bottom:16px;">⏳</div>
+            <h2 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Daftarkan Diri ke Antrian?</h2>
+            <p style="font-size:13px;color:var(--text-sm);line-height:1.6;margin-bottom:28px;">
+              Anda akan mendapatkan nomor antrian. Kami akan memberi tahu Anda ketika buku tersedia untuk dipinjam.
+            </p>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <a href="/api/peminjam/katalog" class="btn btn-secondary">Batal</a>
+              <form action="/api/peminjam/antri/<%= bookId %>" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-primary">
+                  <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                  Ya, Daftarkan Saya
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+    if (el.dataset.page === 'antrian') el.classList.add('active');
+  });
+</script>
 </body>
 </html>

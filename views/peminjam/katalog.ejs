@@ -1,43 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog Buku — Perpustakaan SMA PESAT</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-      <%- include('../partials/navbar') %>
+<div class="app-layout">
+  <%- include('../partials/navbar') %>
 
-      <form action="/api/peminjam/searchBook" method="GET">
-        <input 
-            type="text" 
-            name="q" 
-            value="<%= keyword %>" 
-            placeholder="Cari judul buku..."
-        >
-        <button type="submit">Cari</button>
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <span class="topbar-search-icon">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </span>
+        <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
+          <input type="text" name="q" value="<%= typeof keyword !== 'undefined' ? keyword : '' %>" placeholder="Cari Koleksi...">
         </form>
+      </div>
+      <div class="topbar-actions">
+      </div>
+    </div>
 
-        <%
-        const dataBuku = results.length > 0 ? results : buku;
-        %>
+    <!-- Page Body -->
+    <div class="page-body">
+      <% const dataBuku = (typeof results !== 'undefined' && results.length > 0) ? results : (typeof buku !== 'undefined' ? buku : []); %>
 
-        <% dataBuku.forEach(b => { %>
-        <div class="buku-card">
-            <h2><%= b.judul %></h2>
-            <p><%= b.pengarang %></p>
-            <p><%= b.kategori %></p>
-
-            <p>Stok Tersedia: <%= b.stok_tersedia %></p>
-
-            <a href="/api/peminjam/detail/<%= b.id %>">
-            Detail
-            </a>
+      <!-- Header -->
+      <div class="katalog-header">
+        <h1>Katalog Buku</h1>
+        <div class="katalog-toolbar">
+          <% if (typeof keyword !== 'undefined' && keyword) { %>
+          <span class="badge badge-orange">Hasil pencarian: "<%= keyword %>"</span>
+          <a href="/api/peminjam/katalog" class="btn btn-secondary btn-sm">Tampilkan Semua</a>
+          <% } %>
+          <span class="text-muted text-sm"><%= dataBuku.length %> buku ditemukan</span>
         </div>
-        <% }) %>
+      </div>
 
-        <% if(results.length === 0 && keyword) { %>
-        <p>No results found for '<%= keyword %>'</p>
+      <!-- No results -->
+      <% if (dataBuku.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-state-icon">📚</div>
+        <h3>Tidak ada buku ditemukan</h3>
+        <% if (typeof keyword !== 'undefined' && keyword) { %>
+        <p>Tidak ada hasil untuk "<%= keyword %>". Coba kata kunci lain.</p>
+        <% } else { %>
+        <p>Belum ada buku di katalog.</p>
         <% } %>
+      </div>
+      <% } else { %>
+
+      <!-- Book Grid -->
+      <div class="katalog-grid">
+        <% dataBuku.forEach(function(b) { %>
+        <div class="book-card">
+          <div class="book-cover">
+            <div class="book-cover-placeholder"></div>
+          </div>
+          <div class="book-info">
+            <div class="book-title"><%= b.judul %></div>
+            <div class="book-author"><%= b.pengarang %></div>
+            <div class="book-category"><%= b.kategori %></div>
+            <div class="book-stock">
+              Stok Tersedia: <strong><%= b.stok_tersedia %></strong>
+            </div>
+          </div>
+          <div class="book-actions">
+            <a href="/api/peminjam/detail/<%= b.id %>" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;">
+              Detail
+            </a>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+      <% } %>
+    </div>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+    if (el.dataset.page === 'katalog') el.classList.add('active');
+  });
+</script>
 </body>
 </html>
