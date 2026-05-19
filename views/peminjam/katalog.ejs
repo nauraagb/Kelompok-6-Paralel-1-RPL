@@ -14,15 +14,81 @@
     <!-- Topbar -->
     <div class="topbar">
       <div class="topbar-search">
-        <span class="topbar-search-icon">
-          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-        </span>
-        <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
-          <input type="text" name="q" value="<%= typeof keyword !== 'undefined' ? keyword : '' %>" placeholder="Cari Koleksi...">
-        </form>
-      </div>
+
+  <form action="/api/peminjam/searchBook"
+        method="GET"
+        class="search-form">
+
+    <!-- SEARCH -->
+    <div class="search-input-wrapper">
+      <span class="topbar-search-icon">
+        <svg width="16" height="16"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0
+                   7 7 0 0114 0z"/>
+        </svg>
+      </span>
+
+      <input
+        type="text"
+        name="q"
+        value="<%= typeof keyword !== 'undefined'
+          ? keyword
+          : '' %>"
+        placeholder="Cari Koleksi..."
+      >
+    </div>
+
+    <!-- RIGHT FILTER -->
+    <div class="search-right">
+
+      <select name="kategori" class="genre-select">
+
+        <option value="">Semua Genre</option>
+
+        <option value="Novel"
+          <%= kategori === 'Novel' ? 'selected' : '' %>>
+          Novel
+        </option>
+
+        <option value="Teknologi"
+          <%= kategori === 'Teknologi' ? 'selected' : '' %>>
+          Teknologi
+        </option>
+
+        <option value="Sejarah"
+          <%= kategori === 'Sejarah' ? 'selected' : '' %>>
+          Sejarah
+        </option>
+
+        <option value="Sains"
+          <%= kategori === 'Sains' ? 'selected' : '' %>>
+          Sains
+        </option>
+
+        <option value="Pendidikan"
+          <%= kategori === 'Pendidikan' ? 'selected' : '' %>>
+          Pendidikan
+        </option>
+
+      </select>
+
+      <button type="submit"
+              class="btn btn-primary btn-sm">
+        Filter
+      </button>
+
+    </div>
+
+  </form>
+</div>
       <div class="topbar-actions">
       </div>
     </div>
@@ -61,7 +127,11 @@
         <% dataBuku.forEach(function(b) { %>
         <div class="book-card">
           <div class="book-cover">
-            <div class="book-cover-placeholder"></div>
+            <div class="book-cover-placeholder">
+              <% if (b.cover) { %>
+              <img src="<%= b.cover %>" class="book-cover-img">
+              <% } %>
+            </div>
           </div>
           <div class="book-info">
             <div class="book-title"><%= b.judul %></div>

@@ -32,13 +32,27 @@ router.post('/', auth, async (req, res) => {
     );
     if (dup.rows.length) return res.status(400).json({ message: 'Peminjam sudah ada di antrian buku ini' });
     // Nomor antrian berikutnya
-    const max = await db.query(
-      "SELECT COALESCE(MAX(nomor_antrian),0)+1 AS next FROM antrian WHERE buku_id=$1 AND status='menunggu'",
-      [buku_id]
-    );
+    const nomorResult = await db.query(`
+      SELECT MIN(t1.nomor_antrian + 1) AS next
+      FROM antrian t1
+      WHERE t1.buku_id = $1
+        AND NOT EXISTS (
+          SELECT 1
+          FROM antrian t2
+          WHERE t2.buku_id = t1.buku_id
+            AND t2.status = 'menunggu'
+            AND t2.nomor_antrian = t1.nomor_antrian + 1
+        )
+    `, [buku_id]);
+
+    let nextNomor = nomorResult.rows[0].next;
+
+    if (!nextNomor) {
+      nextNomor = 1;
+    }
     const { rows } = await db.query(
       'INSERT INTO antrian (peminjam_id,buku_id,nomor_antrian) VALUES ($1,$2,$3) RETURNING *',
-      [peminjam_id, buku_id, max.rows[0].next]
+      [peminjam_id, buku_id, nextNomor]
     );
     res.status(201).json(rows[0]);
   } catch (err) { res.status(500).json({ message: err.message }); }

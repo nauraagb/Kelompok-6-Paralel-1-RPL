@@ -3,8 +3,27 @@ const multer = require('multer');
 const { parse } = require('csv-parse');
 const db   = require('../db');
 const auth = require('../middleware/auth');
+const path = require('path');
+const fs = require('fs');
+// const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+const uploadDir = path.join(process.cwd(), 'frontend/uploads');
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, unique + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
 
 // GET /api/buku  – list + search
 router.get('/', auth, async (req, res) => {
@@ -40,18 +59,49 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // POST /api/buku
-router.post('/', auth, async (req, res) => {
-  const { judul, pengarang, penerbit, tahun_terbit, isbn, kategori, jumlah_stok } = req.body;
-  if (!judul) return res.status(400).json({ message: 'Judul wajib diisi' });
+router.post('/', auth, upload.single('cover'), async (req, res) => {
+   const {
+    judul,
+    pengarang,
+    penerbit,
+    tahun_terbit,
+    isbn,
+    kategori,
+    jumlah_stok
+  } = req.body;
+
+  if (!judul)
+    return res.status(400).json({ message: 'Judul wajib diisi' });
+
   const stok = parseInt(jumlah_stok) || 1;
+
+  const cover = req.file
+    ? `/uploads/${req.file.filename}`
+    : null;
+
   try {
     const { rows } = await db.query(
-      `INSERT INTO buku (judul,pengarang,penerbit,tahun_terbit,isbn,kategori,jumlah_stok,stok_tersedia)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$7) RETURNING *`,
-      [judul, pengarang||null, penerbit||null, tahun_terbit||null, isbn||null, kategori||null, stok]
+      `INSERT INTO buku
+      (judul,pengarang,penerbit,tahun_terbit,isbn,kategori,jumlah_stok,stok_tersedia,cover)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$7,$8)
+      RETURNING *`,
+      [
+        judul,
+        pengarang || null,
+        penerbit || null,
+        tahun_terbit || null,
+        isbn || null,
+        kategori || null,
+        stok,
+        cover
+      ]
     );
+
     res.status(201).json(rows[0]);
-  } catch (err) { res.status(500).json({ message: err.message }); }
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // PUT /api/buku/:id

@@ -85,6 +85,10 @@
           <label class="form-label">Jumlah Stok</label>
           <input id="f-stok" type="number" class="form-control" placeholder="1" min="1" value="1">
         </div>
+        <div class="form-group">
+        <label class="form-label">Cover Buku</label>
+        <input id="f-cover" type="file" accept="image/*" class="form-control">
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -194,30 +198,53 @@
   }
 
   async function saveBuku() {
-    const id   = document.getElementById('buku-id').value;
-    const body = {
-      judul:        document.getElementById('f-judul').value.trim(),
-      pengarang:    document.getElementById('f-pengarang').value.trim(),
-      penerbit:     document.getElementById('f-penerbit').value.trim(),
-      tahun_terbit: document.getElementById('f-tahun').value || null,
-      isbn:         document.getElementById('f-isbn').value.trim(),
-      kategori:     document.getElementById('f-kategori').value.trim(),
-      jumlah_stok:  parseInt(document.getElementById('f-stok').value) || 1,
-    };
-    if (!body.judul) { Toast.error('Judul wajib diisi'); return; }
-    const btn = document.getElementById('save-btn');
-    btn.disabled = true;
-    try {
-      const res  = id ? await API.put(`/buku/${id}`, body) : await API.post('/buku', body);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      Toast.success(id ? 'Buku berhasil diperbarui' : 'Buku berhasil ditambahkan');
-      closeModal('form-modal');
-      loadBuku(currentPage);
-      loadKategori();
-    } catch (err) { Toast.error(err.message); }
-    finally { btn.disabled = false; }
+  const id = document.getElementById('buku-id').value;
+
+  const fd = new FormData();
+
+  fd.append('judul', document.getElementById('f-judul').value.trim());
+  fd.append('pengarang', document.getElementById('f-pengarang').value.trim());
+  fd.append('penerbit', document.getElementById('f-penerbit').value.trim());
+  fd.append('tahun_terbit', document.getElementById('f-tahun').value);
+  fd.append('isbn', document.getElementById('f-isbn').value.trim());
+  fd.append('kategori', document.getElementById('f-kategori').value.trim());
+  fd.append('jumlah_stok', document.getElementById('f-stok').value);
+
+  const cover = document.getElementById('f-cover').files[0];
+  if (cover) {
+    fd.append('cover', cover);
   }
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(
+      id ? `/api/buku/${id}` : '/api/buku',
+      {
+        method: id ? 'PUT' : 'POST',
+        body: fd,
+        credentials: 'include'
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    Toast.success(id
+      ? 'Buku berhasil diperbarui'
+      : 'Buku berhasil ditambahkan');
+
+    closeModal('form-modal');
+    loadBuku(currentPage);
+
+  } catch (err) {
+    Toast.error(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
 
   async function deleteBuku(id, judul) {
     if (!confirmDialog(`Hapus buku "${judul}"?`)) return;

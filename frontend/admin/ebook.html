@@ -69,8 +69,27 @@
 <script>
   initSidebar('ebook');
   let currentPage = 1, currentTotal = 0;
+  let searchTimeout;
+  window.bookCache = {};
 
-  document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(1); });
+  document.getElementById('q')
+  .addEventListener('input', () => {
+
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+
+      const q = document.getElementById('q')
+        .value
+        .trim();
+
+      if (!q) return;
+
+      doSearch(1);
+
+    }, 500);
+});
+  // document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(1); });
 
   async function doSearch(page = 1) {
     currentPage = page;
@@ -100,15 +119,16 @@
       grid.innerHTML = '<p class="text-muted text-center" style="grid-column:1/-1;padding:40px">Tidak ada e-book ditemukan</p>';
       return;
     }
-
+   
     grid.innerHTML = data.data.map(b => {
+       window.bookCache[b.id] = b;
       const links = Object.entries(b.download).filter(([,url]) => url);
       const dlBtns = links.map(([fmt, url]) => `<a href="${url}" target="_blank" class="btn btn-primary btn-sm">⬇ ${fmt.toUpperCase()}</a>`).join('');
       return `
         <div class="ebook-card">
           <div class="ebook-cover" onclick="showDetail(${b.id})" style="cursor:pointer">
             ${b.cover
-              ? `<img src="${b.cover}" alt="${b.judul}" loading="lazy">`
+              ? `<img src="${b.cover}" alt="${b.judul}" loading="lazy" decoding="async">`
               : `<span class="ebook-cover-placeholder">📖</span>`}
           </div>
           <div class="ebook-info">
@@ -122,54 +142,206 @@
         </div>`;
     }).join('');
 
-    renderPagination('pagination', Math.min(data.total, 1000), page, 32, 'doSearch');
+    renderPagination('pagination', Math.min(data.total, 1000), page, 12, 'doSearch');
   }
 
+  // async function showDetail(id) {
+  //   document.getElementById('detail-modal').classList.add('open');
+  //   document.getElementById('detail-title').textContent = 'Memuat…';
+  //   document.getElementById('detail-body').innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
+    
+  //   const res  = await API.get(`/ebook/${id}`);
+  //   const b    = await res.json();
+  //   if (!res.ok) {
+  //     document.getElementById('detail-body').innerHTML = `<div class="alert alert-error">${b.message}</div>`;
+  //     return;
+  //   }
+  //   document.getElementById('detail-title').textContent = b.judul;
+
+  //   const links = Object.entries(b.download).filter(([,url]) => url);
+  //   const dlBtns = links.map(([fmt, url]) =>
+  //     `<a href="${url}" target="_blank" class="btn btn-primary">⬇ Download ${fmt.toUpperCase()}</a>`
+  //   ).join('');
+
+  //   document.getElementById('detail-body').innerHTML = `
+  //     <div style="display:flex;gap:24px;flex-wrap:wrap">
+  //       <div style="flex-shrink:0">
+  //         ${b.cover ? `<img src="${b.cover}" style="width:140px;border-radius:8px;box-shadow:var(--shadow)">` : '<div style="width:140px;height:200px;background:var(--primary-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px">📖</div>'}
+  //       </div>
+  //       <div style="flex:1;min-width:200px">
+  //         <h3 style="margin-bottom:8px;color:var(--text)">${b.judul}</h3>
+  //         <p class="text-muted" style="margin-bottom:12px">${b.pengarang}</p>
+  //         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+  //           <span class="badge badge-orange">${b.bahasa}</span>
+  //           <span class="badge badge-gray">${Number(b.unduhan).toLocaleString('id-ID')} unduhan</span>
+  //         </div>
+  //         ${b.subjek.length ? `<div style="margin-bottom:16px"><strong class="text-sm">Subjek:</strong><br>${b.subjek.slice(0,5).map(s => `<span class="badge badge-blue" style="margin:2px">${s}</span>`).join('')}</div>` : ''}
+  //         <div style="display:flex;gap:8px;flex-wrap:wrap">
+  //           ${dlBtns || '<span class="text-muted">Tidak ada link unduhan tersedia</span>'}
+  //         </div>
+  //         <p class="text-muted" style="margin-top:12px;font-size:11px">
+  //           Sumber: <a href="https://www.gutenberg.org/ebooks/${b.id}" target="_blank" style="color:var(--primary)">Project Gutenberg #${b.id}</a>
+  //         </p>
+  //       </div>
+  //     </div>`;
+  // }
+
   async function showDetail(id) {
-    document.getElementById('detail-modal').classList.add('open');
-    document.getElementById('detail-title').textContent = 'Memuat…';
-    document.getElementById('detail-body').innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
 
-    const res  = await API.get(`/ebook/${id}`);
-    const b    = await res.json();
-    if (!res.ok) {
-      document.getElementById('detail-body').innerHTML = `<div class="alert alert-error">${b.message}</div>`;
-      return;
-    }
-    document.getElementById('detail-title').textContent = b.judul;
+  document.getElementById('detail-modal')
+    .classList.add('open');
 
-    const links = Object.entries(b.download).filter(([,url]) => url);
-    const dlBtns = links.map(([fmt, url]) =>
-      `<a href="${url}" target="_blank" class="btn btn-primary">⬇ Download ${fmt.toUpperCase()}</a>`
-    ).join('');
+  // kalau ada cache → tampilkan langsung
+  const cached = window.bookCache[id];
+
+  if (cached) {
+
+    document.getElementById('detail-title')
+      .textContent = cached.judul;
 
     document.getElementById('detail-body').innerHTML = `
       <div style="display:flex;gap:24px;flex-wrap:wrap">
         <div style="flex-shrink:0">
-          ${b.cover ? `<img src="${b.cover}" style="width:140px;border-radius:8px;box-shadow:var(--shadow)">` : '<div style="width:140px;height:200px;background:var(--primary-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px">📖</div>'}
+          ${cached.cover
+            ? `<img 
+                src="${cached.cover}" 
+                loading="lazy"
+                decoding="async"
+                style="width:140px;border-radius:8px;box-shadow:var(--shadow)">
+              `
+            : `<div style="width:140px;height:200px;background:var(--primary-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px">
+                📖
+              </div>`
+          }
         </div>
+
         <div style="flex:1;min-width:200px">
-          <h3 style="margin-bottom:8px;color:var(--text)">${b.judul}</h3>
-          <p class="text-muted" style="margin-bottom:12px">${b.pengarang}</p>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
-            <span class="badge badge-orange">${b.bahasa}</span>
-            <span class="badge badge-gray">${Number(b.unduhan).toLocaleString('id-ID')} unduhan</span>
-          </div>
-          ${b.subjek.length ? `<div style="margin-bottom:16px"><strong class="text-sm">Subjek:</strong><br>${b.subjek.slice(0,5).map(s => `<span class="badge badge-blue" style="margin:2px">${s}</span>`).join('')}</div>` : ''}
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            ${dlBtns || '<span class="text-muted">Tidak ada link unduhan tersedia</span>'}
-          </div>
-          <p class="text-muted" style="margin-top:12px;font-size:11px">
-            Sumber: <a href="https://www.gutenberg.org/ebooks/${b.id}" target="_blank" style="color:var(--primary)">Project Gutenberg #${b.id}</a>
+          <h3 style="margin-bottom:8px;color:var(--text)">
+            ${cached.judul}
+          </h3>
+
+          <p class="text-muted" style="margin-bottom:12px">
+            ${cached.pengarang}
           </p>
+
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="badge badge-orange">
+              ${cached.bahasa}
+            </span>
+
+            <span class="badge badge-gray">
+              ${Number(cached.unduhan).toLocaleString('id-ID')} unduhan
+            </span>
+          </div>
         </div>
-      </div>`;
+      </div>
+    `;
   }
 
+  // fetch detail lengkap
+  try {
+
+    const res = await API.get(`/ebook/${id}`);
+    const b = await res.json();
+
+    if (!res.ok) {
+      throw new Error(b.message);
+    }
+
+    window.bookCache[id] = b;
+
+    const links = Object.entries(b.download)
+      .filter(([,url]) => url);
+
+    const dlBtns = links.map(([fmt, url]) =>
+      `<a href="${url}" target="_blank" class="btn btn-primary">
+        ⬇ Download ${fmt.toUpperCase()}
+      </a>`
+    ).join('');
+
+    document.getElementById('detail-title')
+      .textContent = b.judul;
+
+    document.getElementById('detail-body').innerHTML = `
+      <div style="display:flex;gap:24px;flex-wrap:wrap">
+        <div style="flex-shrink:0">
+          ${b.cover
+            ? `<img 
+                src="${b.cover}"
+                loading="lazy"
+                decoding="async"
+                style="width:140px;border-radius:8px;box-shadow:var(--shadow)">
+              `
+            : `<div style="width:140px;height:200px;background:var(--primary-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px">
+                📖
+              </div>`
+          }
+        </div>
+
+        <div style="flex:1;min-width:200px">
+
+          <h3 style="margin-bottom:8px;color:var(--text)">
+            ${b.judul}
+          </h3>
+
+          <p class="text-muted" style="margin-bottom:12px">
+            ${b.pengarang}
+          </p>
+
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+            <span class="badge badge-orange">
+              ${b.bahasa}
+            </span>
+
+            <span class="badge badge-gray">
+              ${Number(b.unduhan).toLocaleString('id-ID')} unduhan
+            </span>
+          </div>
+
+          ${
+            b.subjek.length
+              ? `
+                <div style="margin-bottom:16px">
+                  <strong class="text-sm">Subjek:</strong><br>
+
+                  ${b.subjek.slice(0,5).map(s =>
+                    `<span class="badge badge-blue" style="margin:2px">
+                      ${s}
+                    </span>`
+                  ).join('')}
+                </div>
+              `
+              : ''
+          }
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${dlBtns}
+          </div>
+
+        </div>
+      </div>
+    `;
+
+  } catch(err) {
+
+    document.getElementById('detail-body').innerHTML = `
+      <div class="alert alert-error">
+        ${err.message}
+      </div>
+    `;
+  }
+}
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
   // Load default (buku populer)
-  doSearch(1);
+  // doSearch(1);
+
+  grid.innerHTML = `
+  <div class="text-muted text-center"
+       style="grid-column:1/-1;padding:40px">
+    Cari e-book untuk memulai
+  </div>
+`;
 </script>
 </body>
 </html>

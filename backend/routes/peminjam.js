@@ -51,6 +51,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  console.log('PEMINJAM LOGOUT');
+  res.redirect('/peminjam/login');
+});
+
 router.get('/dashboard', auth, async (req, res) => {
   const id = req.user.id;
   const namaUser = await db.query(`SELECT nama FROM peminjam WHERE id = $1`, [id]);
@@ -213,14 +219,16 @@ router.get('/katalog', async (req, res) => {
         tahun_terbit,
         jumlah_stok,
         stok_tersedia,
-        kategori
+        kategori,
+        cover
       FROM buku
       ORDER BY judul ASC
     `);
     res.render('peminjam/katalog', {
       buku: result.rows,
       results: [],
-      keyword: ''
+      keyword: '',
+      kategori: ''
     });
   } catch (err){
     console.log('ERROR: ', err.message);
@@ -255,22 +263,53 @@ router.get('/detail/:id', auth, async(req, res) => {
 });
 
 router.get('/searchBook', auth, async(req, res) => {
+  const kategori = req.query.kategori || '';
   const keyword = req.query.q || '';
   let results = [];
 
   try {
-    if (keyword) {
-      const query = await db.query(
-        `SELECT * FROM buku WHERE judul ILIKE $1`,
-        [`%${keyword}%`]
-      );
+    let sql = `
+      SELECT *
+      FROM buku
+      WHERE 1=1
+    `;
 
-      results = query.rows;
+    const values = [];
+    let index = 1;
+
+    if (keyword) {
+       sql += `
+        AND (
+          judul ILIKE $${index}
+          OR pengarang ILIKE $${index}
+        )
+      `;
+
+      values.push(`%${keyword}%`);
+      index++;
     }
+    if (kategori) {
+
+      sql += `
+        AND kategori ILIKE $${index}
+      `;
+
+      values.push(kategori);
+      index++;
+    }
+
+    sql += `
+      ORDER BY judul ASC
+    `;
+
+    const query = await db.query(sql, values);
+
+    results = query.rows;
 
     res.render("peminjam/katalog", {
       results,
-      keyword
+      keyword,
+      kategori
     });
 
   } catch(err) {
@@ -312,7 +351,7 @@ router.post('/antri/:id', auth, async(req, res) => {
       `, [userId, id, nomor]);
 
       await client.query('COMMIT');
-      res.redirect("/dashboard");
+      res.redirect("/api/peminjam/dashboard");
       } catch(err){
         console.log("ERROR: ", err.message);
       }

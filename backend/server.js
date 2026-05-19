@@ -33,7 +33,7 @@ app.use('/api/peminjaman', peminjamanRoute);
 app.use('/api/antrian',    antrianRoute);
 app.use('/api/laporan',    laporanRoute);
 app.use('/api/ebook',      ebookRoute);
-
+app.use('/uploads', express.static(path.join(process.cwd(), 'frontend/uploads')));
 
 
 // Fallback to login

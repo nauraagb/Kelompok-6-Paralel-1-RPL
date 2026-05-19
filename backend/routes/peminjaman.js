@@ -102,35 +102,88 @@ router.put('/:id/tolak', auth, async (req, res) => {
 // PUT /api/peminjaman/:id/kembalikan
 router.put('/:id/kembalikan', auth, async (req, res) => {
   const client = await require('../db').connect();
+
   try {
     await client.query('BEGIN');
-    const { rows } = await client.query('SELECT * FROM transaksi_peminjaman WHERE id=$1 FOR UPDATE', [req.params.id]);
-    if (!rows.length) throw new Error('Tidak ditemukan');
-    if (rows[0].status !== 'dipinjam') throw new Error('Buku belum dalam status dipinjam');
-    await client.query('UPDATE buku SET stok_tersedia=stok_tersedia+1 WHERE id=$1', [rows[0].buku_id]);
-    const updated = await client.query(
-      `UPDATE transaksi_peminjaman SET status='selesai', tgl_kembali_aktual=CURRENT_DATE, admin_id=$1
-       WHERE id=$2 RETURNING *`, [req.user.id, req.params.id]
+
+    const { rows } = await client.query(
+      'SELECT * FROM transaksi_peminjaman WHERE id=$1 FOR UPDATE',
+      [req.params.id]
     );
-    // Cek antrian — otomatis buat pengajuan untuk antrian pertama
+
+    if (!rows.length)
+      throw new Error('Tidak ditemukan');
+
+    if (rows[0].status !== 'dipinjam')
+      throw new Error('Buku belum dalam status dipinjam');
+
+    // cek antrian
     const antrian = await client.query(
-      `SELECT * FROM antrian WHERE buku_id=$1 AND status='menunggu' ORDER BY nomor_antrian ASC LIMIT 1`,
+      `SELECT * FROM antrian 
+       WHERE buku_id=$1 
+       AND status='menunggu'
+       ORDER BY nomor_antrian ASC
+       LIMIT 1`,
       [rows[0].buku_id]
     );
+
+    // update transaksi lama jadi selesai
+    const updated = await client.query(
+      `UPDATE transaksi_peminjaman
+       SET status='selesai',
+           tgl_kembali_aktual=CURRENT_DATE,
+           admin_id=$1
+       WHERE id=$2
+       RETURNING *`,
+      [req.user.id, req.params.id]
+    );
+
+    // kalau ADA antrian
     if (antrian.rows.length) {
+
       await client.query(
-        `INSERT INTO transaksi_peminjaman (peminjam_id,buku_id,tgl_kembali_rencana,catatan)
-         VALUES ($1,$2,CURRENT_DATE+14,'Dari antrian')`,
-        [antrian.rows[0].peminjam_id, rows[0].buku_id]
+        `INSERT INTO transaksi_peminjaman
+        (peminjam_id, buku_id, tgl_kembali_rencana, status, catatan)
+        VALUES ($1, $2, CURRENT_DATE + 14, 'menunggu', 'Dari antrian')`,
+        [
+          antrian.rows[0].peminjam_id,
+          rows[0].buku_id
+        ]
       );
-      await client.query("UPDATE antrian SET status='diproses' WHERE id=$1", [antrian.rows[0].id]);
+
+      await client.query(
+        `UPDATE antrian
+         SET status='diproses'
+         WHERE id=$1`,
+        [antrian.rows[0].id]
+      );
+
+    } else {
+
+      // hanya tambah stok jika TIDAK ADA antrian
+      await client.query(
+        `UPDATE buku
+         SET stok_tersedia = stok_tersedia + 1
+         WHERE id=$1`,
+        [rows[0].buku_id]
+      );
     }
+
     await client.query('COMMIT');
+
     res.json(updated.rows[0]);
+
   } catch (err) {
+
     await client.query('ROLLBACK');
-    res.status(400).json({ message: err.message });
-  } finally { client.release(); }
+
+    res.status(400).json({
+      message: err.message
+    });
+
+  } finally {
+    client.release();
+  }
 });
 
 module.exports = router;
