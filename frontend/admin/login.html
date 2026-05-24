@@ -8,13 +8,18 @@
 </head>
 <body>
 <div class="login-page">
+
+  <!-- Left Panel -->
   <div class="login-left">
+    <img src="/assets/hero-students.jpg" alt="Siswa SMA PESAT" class="login-left-photo">
+    <div class="login-left-overlay"></div>
     <div class="login-hero">
-      <div class="login-hero-icon">📚</div>
-      <h1>Perpustakaan SMA Pesat Bogor</h1>
-      <p>Sistem Informasi Perpustakaan Digital yang memudahkan pengelolaan buku, peminjaman, dan laporan.</p>
+      <h1>Sistem Informasi Perpustakaan</h1>
+      <p>Platform pengelolaan buku, peminjaman, dan laporan perpustakaan SMA PESAT Bogor secara digital.</p>
     </div>
   </div>
+
+  <!-- Right Panel -->
   <div class="login-right">
     <div class="login-form-wrap">
       <div class="login-logo">
@@ -35,19 +40,17 @@
           Masuk
         </button>
       </div>
-      <p class="text-muted text-sm" style="margin-top:24px; text-align:center;">
-        Default: admin / admin123
-      </p>
     </div>
   </div>
-</div>
 
+</div>
 <script src="/assets/js/api.js"></script>
 <script>
-  // Jika sudah login, redirect ke dashboard
   if (API.getToken()) window.location.href = '/admin/dashboard.html';
 
-  document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
 
   async function doLogin() {
     const username = document.getElementById('username').value.trim();
@@ -56,7 +59,7 @@
     const btn      = document.getElementById('login-btn');
     errEl.style.display = 'none';
     if (!username || !password) {
-      errEl.textContent = 'Username dan password wajib diisi';
+      errEl.textContent   = 'Username dan password wajib diisi';
       errEl.style.display = 'block';
       return;
     }
@@ -64,9 +67,9 @@
     btn.textContent = 'Memproses…';
     try {
       const res  = await fetch('/api/auth/login', {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body:    JSON.stringify({ username, password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Login gagal');
@@ -74,10 +77,10 @@
       API.setUser(data.user);
       window.location.href = '/admin/dashboard.html';
     } catch (err) {
-      errEl.textContent    = err.message;
-      errEl.style.display  = 'block';
-      btn.disabled         = false;
-      btn.textContent      = 'Masuk';
+      errEl.textContent   = err.message;
+      errEl.style.display = 'block';
+      btn.disabled        = false;
+      btn.textContent     = 'Masuk';
     }
   }
 </script>

@@ -51,6 +51,17 @@ router.post('/login', async (req, res) => {
   }
 });
 
+
+// GET /api/peminjam/me - return current user info (for static HTML pages like ebook.html)
+router.get('/me', auth, (req, res) => {
+  res.json({
+    id: req.user.id,
+    nama: req.user.nama,
+    kelas: req.user.kelas || '',
+    tipe: req.user.tipe || 'siswa'
+  });
+});
+
 router.get('/logout', (req, res) => {
   res.clearCookie('token');
   console.log('PEMINJAM LOGOUT');
@@ -207,7 +218,7 @@ router.get('/formaja', auth, async (req, res) => {
   );
 });
 
-router.get('/katalog', async (req, res) => {
+router.get('/katalog', auth, async (req, res) => {
   try {
     const result = await db.query(`
       SELECT 
@@ -224,14 +235,18 @@ router.get('/katalog', async (req, res) => {
       FROM buku
       ORDER BY judul ASC
     `);
+    const nama = req.user?.nama || 'Pengguna';
     res.render('peminjam/katalog', {
       buku: result.rows,
       results: [],
       keyword: '',
-      kategori: ''
+      kategori: '',
+      user: req.user,
+      nama
     });
   } catch (err){
     console.log('ERROR: ', err.message);
+    res.status(500).send('Terjadi kesalahan: ' + err.message);
   }
 });
 
@@ -306,10 +321,13 @@ router.get('/searchBook', auth, async(req, res) => {
 
     results = query.rows;
 
+    const nama = req.user?.nama || 'Pengguna';
     res.render("peminjam/katalog", {
       results,
       keyword,
-      kategori
+      kategori,
+      user: req.user,
+      nama
     });
 
   } catch(err) {
@@ -372,8 +390,11 @@ router.get("/antrianSaya", auth, async(req, res) => {
                     FROM antrian a
                     JOIN buku b ON a.buku_id = b.id 
                     WHERE a.peminjam_id = $1`, [id]);
+    const nama = req.user?.nama || 'Pengguna';
     res.render("peminjam/daftarAntrian", {
-      antrian: result.rows
+      antrian: result.rows,
+      user: req.user,
+      nama
     });
   }catch(err){
     console.log('ERROR: ', err.message);
@@ -393,8 +414,11 @@ router.get("/riwayat", auth, async(req, res) => {
       FROM transaksi_peminjaman tp
       JOIN buku b ON tp.buku_id = b.id
       WHERE tp.peminjam_id = $1;`, [id]);
+    const nama = req.user?.nama || 'Pengguna';
     res.render("peminjam/riwayat", {
-      peminjaman: result.rows
+      peminjaman: result.rows,
+      user: req.user,
+      nama
     });
   } catch (err){
     console.log("ERROR: ", err.message);
@@ -415,8 +439,10 @@ router.get('/akun', auth, async (req, res) => {
       return res.send("User tidak ditemukan");
     }
 
+    const nama = req.user?.nama || result.rows[0]?.nama || 'Pengguna';
     res.render('peminjam/akun', {
-      user: result.rows[0]
+      user: result.rows[0],
+      nama
     });
 
   } catch (err) {

@@ -48,8 +48,8 @@ app.get('/peminjam/login', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`\n🟠 Perpustakaan SMA Pesat Bogor`);
+  console.log(`\nPerpustakaan SMA Pesat Bogor`);
   console.log(`   Server  : http://localhost:${PORT}`);
-  console.log(`   Login   : http://localhost:${PORT}/login.html`);
-  console.log(`   Default : admin / admin123\n`);
+  console.log(`   Login   : http://localhost:${PORT}/index.html`);
+  console.log(`   Default : admin / password\n`);
 });

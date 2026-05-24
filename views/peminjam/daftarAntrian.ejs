@@ -43,7 +43,16 @@
         <% if (antrian.length === 0) { %>
         <div class="card-body">
           <div class="empty-state">
-            <div class="empty-state-icon">⏳</div>
+            <div class="empty-state-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="9" y1="6"  x2="20" y2="6"/>
+                <line x1="9" y1="12" x2="20" y2="12"/>
+                <line x1="9" y1="18" x2="20" y2="18"/>
+                <circle cx="4" cy="6"  r="1" fill="currentColor" stroke="none"/>
+                <circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/>
+                <circle cx="4" cy="18" r="1" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
             <h3>Tidak ada antrian aktif</h3>
             <p>Anda belum memiliki antrian buku saat ini.</p>
             <a href="/api/peminjam/katalog" class="btn btn-primary btn-sm" style="margin-top:12px;">Lihat Katalog</a>

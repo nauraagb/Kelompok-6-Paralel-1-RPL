@@ -21,7 +21,7 @@
         <div class="card-header">
           <div class="toolbar">
             <div class="search-input">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon"></span>
               <input id="q" type="text" class="form-control" placeholder="Cari nama atau nomor induk…" oninput="debounceSearch()" style="padding-left:34px">
             </div>
             <select id="tipe" class="form-control" style="width:140px" onchange="loadData(1)">
@@ -175,7 +175,7 @@
     document.getElementById('f-tipe').value    = d.tipe;
     document.getElementById('f-kelas').value   = d.kelas || '';
     document.getElementById('f-email').value   = d.email || '';
-    documnet.getElementById('f-password').value = d.password;
+    document.getElementById('f-password').value = d.password;
     document.getElementById('form-modal').classList.add('open');
   }
 

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perpustakaan SMA PESAT Bogor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #0a0f1c;
+      color: white;
+      overflow: hidden;
+    }
+
+    /* ── Hero ── */
+    .landing {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+      display: block;
+      transform: scale(1.04);
+      animation: slowZoom 14s ease-out forwards;
+    }
+    @keyframes slowZoom {
+      from { transform: scale(1.04); }
+      to   { transform: scale(1.00); }
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top,  rgba(8,13,26,.97) 0%, rgba(8,13,26,.72) 38%, transparent 65%),
+        linear-gradient(to bottom, rgba(8,13,26,.55) 0%, transparent 28%);
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      animation: fadeDown .6s ease both;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .topbar-logo {
+      height: 38px;
+      width: auto;
+      display: block;
+      opacity: .92;
+    }
+    .topbar-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 99px;
+      padding: 5px 14px;
+    }
+
+    /* ── Center content ── */
+    .hero-body {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 24px;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #F97316;
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeUp .55s .25s ease both;
+    }
+    .hero-title {
+      font-size: clamp(32px, 5vw, 58px);
+      font-weight: 800;
+      line-height: 1.13;
+      letter-spacing: -.03em;
+      color: #fff;
+      max-width: 700px;
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeUp .6s .38s ease both;
+    }
+    .hero-title span { color: #F97316; }
+    .hero-sub {
+      font-size: 15px;
+      font-weight: 400;
+      color: rgba(255,255,255,.58);
+      line-height: 1.7;
+      max-width: 440px;
+      margin-bottom: 44px;
+      opacity: 0;
+      animation: fadeUp .6s .5s ease both;
+    }
+
+    /* ── CTA Buttons ── */
+    .cta-group {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp .6s .62s ease both;
+    }
+    .cta-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-family: inherit;
+      cursor: pointer;
+      min-width: 220px;
+      background: rgba(255,255,255,.1);
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,.2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: background .22s ease, border-color .22s ease, box-shadow .22s ease, transform .22s ease;
+    }
+    .cta-btn:hover {
+      background: #F97316;
+      border-color: #F97316;
+      transform: translateY(-3px);
+    }
+    .cta-btn-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .22s ease;
+    }
+    .cta-btn:hover .cta-btn-icon { background: rgba(255,255,255,.25); }
+    .cta-btn-icon svg { width: 20px; height: 20px; }
+    .cta-btn-text { text-align: left; }
+    .cta-btn-label {
+      font-size: 14px;
+      font-weight: 700;
+      display: block;
+      line-height: 1.2;
+      text-shadow: 0 1px 8px rgba(0,0,0,.4);
+    }
+    .cta-btn-desc {
+      font-size: 11px;
+      font-weight: 500;
+      display: block;
+      margin-top: 3px;
+      opacity: .72;
+    }
+
+    /* ── Info strip ── */
+    .info-strip {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 48px 32px;
+      opacity: 0;
+      animation: fadeUp .6s .78s ease both;
+    }
+    .info-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 28px;
+    }
+    .info-item + .info-item {
+      border-left: 1px solid rgba(255,255,255,.1);
+    }
+    .info-item-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.45);
+      display: block;
+      margin-bottom: 2px;
+      text-shadow: 0 1px 8px rgba(0,0,0,.8), 0 2px 16px rgba(0,0,0,.6);
+    }
+    .info-item-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,.92);
+      text-shadow: 0 1px 10px rgba(0,0,0,.9), 0 2px 20px rgba(0,0,0,.7);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .topbar { padding: 20px 24px; }
+      .hero-title { font-size: 28px; }
+      .cta-group { flex-direction: column; align-items: center; }
+      .cta-btn { min-width: 280px; }
+      .info-strip { flex-direction: column; padding-bottom: 28px; }
+      .info-item + .info-item { border-left: none; border-top: 1px solid rgba(255,255,255,.1); }
+      .info-item { padding: 10px 16px; width: 100%; max-width: 300px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="landing">
+
+  <img src="/assets/gedung-sekolah.jpg" alt="" class="hero-photo" aria-hidden="true">
+  <div class="hero-overlay"></div>
+
+  <header class="topbar">
+    <img src="/assets/js/logo-sma-pesat.png" alt="SMA PESAT School of Talent" class="topbar-logo">
+  </header>
+
+  <main class="hero-body">
+    <p class="hero-eyebrow"> </p>
+    <h1 class="hero-title">Perpustakaan<br><span></span>Digital Sekolah</h1>
+    <p class="hero-sub">Platform pengelolaan koleksi buku dan peminjaman perpustakaan SMA PESAT Bogor.</p>
+
+    <div class="cta-group">
+
+      <a href="/admin/login.html" class="cta-btn">
+        <div class="cta-btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+          </svg>
+        </div>
+        <div class="cta-btn-text">
+          <span class="cta-btn-label">Masuk sebagai Admin</span>
+          <span class="cta-btn-desc">Panel pengelola perpustakaan</span>
+        </div>
+      </a>
+
+      <a href="/peminjam/login.html" class="cta-btn">
+        <div class="cta-btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+        <div class="cta-btn-text">
+          <span class="cta-btn-label">Masuk sebagai Siswa</span>
+          <span class="cta-btn-desc">Pinjam dan cari koleksi buku</span>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer class="info-strip">
+    <div class="info-item">
+      <div class="info-item-text">
+        <span class="info-item-label">Jam Operasional</span>
+        <span class="info-item-val">Sen – Jum, 07.30 – 15.30</span>
+      </div>
+    </div>
+    <div class="info-item">
+      <div class="info-item-text">
+        <span class="info-item-label">Masa Pinjam</span>
+        <span class="info-item-val">Maksimal 7 hari per buku</span>
+      </div>
+    </div>
+    <div class="info-item">
+      <div class="info-item-text">
+        <span class="info-item-label">Lokasi</span>
+        <span class="info-item-val">Kampus 2, Lantai 2</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.role === 'admin') window.location.href = '/admin/dashboard.html';
+    }
+  } catch(e) {}
+</script>
+
+</body>
+</html>

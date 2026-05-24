@@ -28,7 +28,7 @@
             <div style="display:flex;gap:8px">
               <button class="btn btn-primary" onclick="loadLaporan()">Tampilkan</button>
               <button class="btn btn-secondary" onclick="downloadPDF()" id="pdf-btn">
-                ⬇ Download PDF
+                Download PDF
               </button>
             </div>
           </div>
@@ -111,7 +111,7 @@
     } else {
       pb.innerHTML = data.bukuTerpopuler.map((b, i) => `
         <tr>
-          <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1)+'.'} ${b.judul}</td>
+          <td>${i === 0 ? '#1' : i === 1 ? '#2' : i === 2 ? '#3' : (i+1)+'.'} ${b.judul}</td>
           <td>${b.pengarang || '—'}</td>
           <td><span class="badge badge-orange">${b.jumlah}×</span></td>
         </tr>`).join('');
