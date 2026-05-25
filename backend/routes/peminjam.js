@@ -165,17 +165,22 @@ router.post('/import', auth, upload.single('file'), async (req, res) => {
   const parser  = parse(req.file.buffer.toString(), { columns: true, skip_empty_lines: true, trim: true });
   parser.on('readable', () => { let r; while ((r = parser.read()) !== null) records.push(r); });
   parser.on('error',  (e) => res.status(400).json({ message: e.message }));
+  
   parser.on('end', async () => {
     let ok = 0, skip = 0;
     for (const r of records) {
       if (!r.nomor_induk || !r.nama || !r.tipe || !r.password) { skip++; continue; }
       try {
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(r.password, salt);
         await db.query(
           'INSERT INTO peminjam (nomor_induk,nama,tipe,kelas,email,password) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING',
-          [r.nomor_induk, r.nama, r.tipe, r.kelas||null, r.email||null, r.password]
+          [r.nomor_induk, r.nama, r.tipe, r.kelas||null, r.email||null, hashPassword]
         );
         ok++;
-      } catch { skip++; }
+      } catch (err) { 
+        console.log('ERROR: ', err.message);
+        skip++; }
     }
     res.json({ message: `${ok} berhasil, ${skip} dilewati`, inserted: ok, skipped: skip });
   });
@@ -263,7 +268,8 @@ router.get('/detail/:id', auth, async(req, res) => {
         tahun_terbit,
         jumlah_stok,
         stok_tersedia,
-        kategori
+        kategori,
+        cover
       FROM buku
       WHERE id = $1`, [id]);
     if(result.rows.length == 0){

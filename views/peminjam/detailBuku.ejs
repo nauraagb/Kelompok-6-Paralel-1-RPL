@@ -44,7 +44,19 @@
       <div class="detail-hero">
         <!-- Book Cover -->
         <div class="detail-cover">
-          <div class="detail-cover-placeholder"></div>
+          <div class="detail-cover-placeholder">
+            <% if (detail.cover) { %>
+            <img 
+              src="<%= detail.cover %>" 
+              alt="<%= detail.judul %>"
+              class="detail-cover-image"
+            >
+          <% } else { %>
+            <div class="detail-cover-placeholder">
+              Tidak Ada Cover
+            </div>
+          <% } %>
+          </div>
         </div>
 
         <!-- Book Meta -->

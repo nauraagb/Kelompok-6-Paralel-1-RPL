@@ -86,3 +86,7 @@ VALUES (
   'Admin Perpustakaan'
 )
 ON CONFLICT (username) DO NOTHING;
+
+-- NAMBAHIN KOLOM COVER
+ALTER TABLE buku
+ADD COLUMN cover TEXT;
