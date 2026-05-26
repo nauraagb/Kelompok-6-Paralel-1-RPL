@@ -105,7 +105,7 @@ router.post('/', auth, upload.single('cover'), async (req, res) => {
 });
 
 // PUT /api/buku/:id
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, upload.single('cover'), async (req, res) => {
   const { judul, pengarang, penerbit, tahun_terbit, isbn, kategori, jumlah_stok } = req.body;
   try {
     const old = await db.query('SELECT * FROM buku WHERE id=$1', [req.params.id]);
@@ -113,10 +113,22 @@ router.put('/:id', auth, async (req, res) => {
     const b = old.rows[0];
     const stokBaru = parseInt(jumlah_stok) || b.jumlah_stok;
     const diff = stokBaru - b.jumlah_stok;
-    const tersedia = Math.max(0, b.stok_tersedia + diff);
+    const dipinjam = b.jumlah_stok - b.stok_tersedia;
+    if (stokBaru < dipinjam) {
+      return res.status(400).json({
+        message:
+          'Stok baru lebih kecil dari jumlah buku yang sedang dipinjam'
+      });
+    }
+
+    const tersedia = stokBaru - dipinjam;
+    let cover = b.cover;
+    if (req.file) {
+      cover = `/uploads/${req.file.filename}`;
+    }
     const { rows } = await db.query(
       `UPDATE buku SET judul=$1,pengarang=$2,penerbit=$3,tahun_terbit=$4,isbn=$5,
-       kategori=$6,jumlah_stok=$7,stok_tersedia=$8 WHERE id=$9 RETURNING *`,
+       kategori=$6,jumlah_stok=$7,stok_tersedia=$8,cover=$9 WHERE id=$10 RETURNING *`,
       [judul||b.judul, pengarang??b.pengarang, penerbit??b.penerbit,
        tahun_terbit??b.tahun_terbit, isbn??b.isbn, kategori??b.kategori,
        stokBaru, tersedia, req.params.id]
@@ -127,6 +139,22 @@ router.put('/:id', auth, async (req, res) => {
 
 // DELETE /api/buku/:id
 router.delete('/:id', auth, async (req, res) => {
+  const old = await db.query(
+  'SELECT * FROM buku WHERE id=$1',
+  [req.params.id]
+);
+
+if (old.rows.length && old.rows[0].cover) {
+      const imgPath = path.join(
+        process.cwd(),
+        'frontend',
+        old.rows[0].cover
+      );
+
+      if (fs.existsSync(imgPath)) {
+        fs.unlinkSync(imgPath);
+      }
+    }
   try {
     const check = await db.query(
       "SELECT COUNT(*) FROM transaksi_peminjaman WHERE buku_id=$1 AND status='dipinjam'",
@@ -143,8 +171,12 @@ router.delete('/:id', auth, async (req, res) => {
 router.post('/import', auth, upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'File CSV tidak ditemukan' });
   const records = [];
-  const parser  = parse(req.file.buffer.toString(), {
-    columns: true, skip_empty_lines: true, trim: true
+  const csvContent = fs.readFileSync(req.file.path, 'utf8');
+
+  const parser = parse(csvContent, {
+    columns: true,
+    skip_empty_lines: true,
+    trim: true
   });
   parser.on('readable', () => {
     let r;
@@ -164,6 +196,9 @@ router.post('/import', auth, upload.single('file'), async (req, res) => {
            r.isbn||null, r.kategori||null, stok]
         );
         inserted++;
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
       } catch { skipped++; }
     }
     res.json({ message: `Import selesai: ${inserted} berhasil, ${skipped} dilewati`, inserted, skipped });

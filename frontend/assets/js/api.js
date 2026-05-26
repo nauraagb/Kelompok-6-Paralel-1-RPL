@@ -14,7 +14,7 @@ const API = {
     const res = await fetch(`${this.base}${endpoint}`, { ...opts, headers });
     if (res.status === 401) {
       this.removeToken();
-      window.location.href = '/login.html';
+      window.location.href = '/admin/login.html';
       return;
     }
     return res;
