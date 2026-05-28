@@ -33,11 +33,11 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Username atau password salah' });
 
     const token = jwt.sign(
-      { id: peminjam.id, username: peminjam.username, nama: peminjam.nama },
+      { id: peminjam.id, nomor_induk: peminjam.nomor_induk, nama: peminjam.nama,
+        kelas: peminjam.kelas, tipe: peminjam.tipe },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
     );
-    // res.json({ token, peminjam: { id: peminjam.id, username: peminjam.username, nama: peminjam.nama } });
 
     res.cookie('token', token, {
       httpOnly: true,
@@ -53,13 +53,17 @@ router.post('/login', async (req, res) => {
 
 
 // GET /api/peminjam/me - return current user info (for static HTML pages like ebook.html)
-router.get('/me', auth, (req, res) => {
-  res.json({
-    id: req.user.id,
-    nama: req.user.nama,
-    kelas: req.user.kelas || '',
-    tipe: req.user.tipe || 'siswa'
-  });
+router.get('/me', auth, async (req, res) => {
+  try {
+    const { rows } = await db.query(
+      'SELECT id, nomor_induk, nama, kelas, tipe FROM peminjam WHERE id=$1',
+      [req.user.id]
+    );
+    if (!rows.length) return res.status(404).json({ message: 'User tidak ditemukan' });
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 router.get('/logout', (req, res) => {
@@ -69,18 +73,17 @@ router.get('/logout', (req, res) => {
 });
 
 router.get('/dashboard', auth, async (req, res) => {
-  const id = req.user.id;
-  const namaUser = await db.query(`SELECT nama FROM peminjam WHERE id = $1`, [id]);
-  const nama = namaUser.rows[0].nama;
-  try{
-    res.render("peminjam/dashboard", {
-    user: req.user,
-    nama
-  });
-  }catch(err){
-    console.log("ERROR: ", err.message);
+  try {
+    const { rows } = await db.query('SELECT nama FROM peminjam WHERE id=$1', [req.user.id]);
+    if (!rows.length) return res.redirect('/api/peminjam/logout');
+    res.render('peminjam/dashboard', {
+      user: req.user,
+      nama: rows[0].nama
+    });
+  } catch(err) {
+    console.error('ERROR dashboard:', err.message);
+    res.status(500).send('Terjadi kesalahan server');
   }
-  
 });
 
 // GET /api/peminjam
@@ -188,33 +191,42 @@ router.post('/import', auth, upload.single('file'), async (req, res) => {
 
 
 router.post('/ajukanPinjaman', auth, async (req, res) => {
-    const id = req.user.id;
+  const id = req.user.id;
+  const { tanggalKembaliExpected, idBuku } = req.body;
 
-    try {
-      const { tanggalKembaliExpected, idBuku } = req.body;
-      const today = new Date().toISOString().split('T')[0];
-      const status = "menunggu";
-      const token = crypto.randomBytes(20).toString('hex');
-      const expired = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  // Validasi input sebelum menyentuh DB
+  if (!idBuku || !tanggalKembaliExpected)
+    return res.status(400).json({ message: 'idBuku dan tanggalKembaliExpected wajib diisi' });
 
-      const result = await db.query(
-        `INSERT INTO transaksi_peminjaman 
-        (peminjam_id, buku_id, tgl_pengajuan, tgl_kembali_rencana, status, qr_token, qr_expired_at) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7) 
-        RETURNING id, qr_token`,
-        [id, idBuku, today, tanggalKembaliExpected, status, token, expired]
-);
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const token = crypto.randomBytes(20).toString('hex');
+    const expired = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      const borrowed = result.rows[0];
-      console.log('PEMINJAMAN DIAJUKAN: ', borrowed.id);
-      const url = `${req.protocol}://${req.get('host')}/admin/scan?token=${borrowed.qr_token}`;
-      const qr = await QRCode.toDataURL(url);
+    const result = await db.query(
+      `INSERT INTO transaksi_peminjaman
+      (peminjam_id, buku_id, tgl_pengajuan, tgl_kembali_rencana, status, qr_token, qr_expired_at)
+      VALUES ($1, $2, $3, $4, 'menunggu', $5, $6)
+      RETURNING id, qr_token`,
+      [id, idBuku, today, tanggalKembaliExpected, token, expired]
+    );
 
-      res.render('peminjam/qr', { qr });
+    const borrowed = result.rows[0];
+    const url = `${req.protocol}://${req.get('host')}/admin/scan?token=${borrowed.qr_token}`;
+    const qr = await QRCode.toDataURL(url);
+    const nama = req.user?.nama || 'Pengguna';
+    res.render('peminjam/qr', { qr, user: req.user, nama });
 
-    } catch(err){
-      console.log('ERROR: ', err.message);
-    }
+  } catch(err) {
+    console.error('ERROR ajukan pinjaman:', err.message);
+    const nama = req.user?.nama || 'Pengguna';
+    res.status(500).render('peminjam/qr', {
+      qr: null,
+      error: 'Gagal mengajukan peminjaman: ' + err.message,
+      user: req.user,
+      nama
+    });
+  }
 });
 
 router.get('/formaja', auth, async (req, res) => {
@@ -275,11 +287,15 @@ router.get('/detail/:id', auth, async(req, res) => {
     if(result.rows.length == 0){
        return res.status(404).send("Buku tidak ditemukan");
     }
+    const nama = req.user?.nama || 'Pengguna';
     res.render('peminjam/detailBuku', {
-      detail: result.rows[0]
+      detail: result.rows[0],
+      user: req.user,
+      nama
     });
   } catch (err){
-    console.log('ERROR: ', err.message);
+    console.error('ERROR detail:', err.message);
+    res.status(500).send('Terjadi kesalahan server');
   }
 });
 
@@ -337,123 +353,130 @@ router.get('/searchBook', auth, async(req, res) => {
     });
 
   } catch(err) {
-    console.log('ERROR: ', err.message);
-    res.send("Terjadi error");
+    console.error('ERROR searchBook:', err.message);
+    res.status(500).send('Terjadi kesalahan server');
   }
 });
 
 router.post('/antri/:id', auth, async(req, res) => {
-    const client = await db.connect();
-    try {
-      const { id } = req.params;
-      const userId = req.user.id;
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
 
-      const buku = await client.query(`SELECT stok_tersedia FROM buku WHERE id = $1`, [id]);
-      if (buku.rows[0].stok_tersedia > 0) {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    // Cek buku ada dan lock row untuk hindari race condition
+    const buku = await client.query(
+      'SELECT stok_tersedia FROM buku WHERE id=$1 FOR UPDATE', [id]
+    );
+    if (!buku.rows.length)
+      throw new Error('Buku tidak ditemukan');
+    if (buku.rows[0].stok_tersedia > 0)
       throw new Error('Stok masih ada, tidak perlu antri');
-    }
 
-      const cekAntri = await client.query(`SELECT * FROM antrian WHERE peminjam_id = $1 AND buku_id = $2 AND status = 'menunggu'`, [userId, id]);
-      if(cekAntri.rows.length > 0){
-        throw new Error("Anda sudah dalam antrian.");
-        
-      }
+    // Cek apakah sudah ada di antrian
+    const cekAntri = await client.query(
+      `SELECT id FROM antrian WHERE peminjam_id=$1 AND buku_id=$2 AND status='menunggu'`,
+      [userId, id]
+    );
+    if (cekAntri.rows.length > 0)
+      throw new Error('Anda sudah dalam antrian.');
 
-      const last = await client.query(
-      `SELECT MAX(nomor_antrian) as max 
-       FROM antrian 
-       WHERE buku_id = $1`,
+    // Hitung nomor antrian berikutnya
+    const last = await client.query(
+      'SELECT MAX(nomor_antrian) AS max FROM antrian WHERE buku_id=$1',
       [id]
     );
+    const nomor = (last.rows[0].max || 0) + 1;
 
-      const nomor = (last.rows[0].max || 0) + 1;
+    await client.query(
+      'INSERT INTO antrian (peminjam_id, buku_id, nomor_antrian) VALUES ($1,$2,$3)',
+      [userId, id, nomor]
+    );
 
-    
-      await client.query(`
-        INSERT INTO antrian (peminjam_id, buku_id, nomor_antrian)
-        VALUES ($1, $2, $3)
-      `, [userId, id, nomor]);
+    await client.query('COMMIT');
+    res.redirect('/api/peminjam/dashboard');
 
-      await client.query('COMMIT');
-      res.redirect("/api/peminjam/dashboard");
-      } catch(err){
-        console.log("ERROR: ", err.message);
-      }
+  } catch(err) {
+    await client.query('ROLLBACK');
+    console.error('ERROR antri:', err.message);
+    res.status(400).json({ message: err.message });
+  } finally {
+    client.release();
+  }
 });
 
 router.get("/antrianPage/:id", auth, async(req, res) => {
   const { id } = req.params;
+  const nama = req.user?.nama || 'Pengguna';
   res.render('peminjam/antrian', {
-    bookId: id
-  })
+    bookId: id,
+    user: req.user,
+    nama
+  });
 });
 
 router.get("/antrianSaya", auth, async(req, res) => {
-  const id = req.user.id;
-
-  try{
-    const result = await db.query(`SELECT a.id, a.tgl_daftar, a.nomor_antrian, a.status, b.judul 
-                    FROM antrian a
-                    JOIN buku b ON a.buku_id = b.id 
-                    WHERE a.peminjam_id = $1`, [id]);
+  try {
+    const result = await db.query(
+      `SELECT a.id, a.tgl_daftar, a.nomor_antrian, a.status, b.judul
+       FROM antrian a
+       JOIN buku b ON a.buku_id = b.id
+       WHERE a.peminjam_id = $1`,
+      [req.user.id]
+    );
     const nama = req.user?.nama || 'Pengguna';
-    res.render("peminjam/daftarAntrian", {
+    res.render('peminjam/daftarAntrian', {
       antrian: result.rows,
       user: req.user,
       nama
     });
-  }catch(err){
-    console.log('ERROR: ', err.message);
+  } catch(err) {
+    console.error('ERROR antrianSaya:', err.message);
+    res.status(500).send('Terjadi kesalahan server');
   }
 })
 
 router.get("/riwayat", auth, async(req, res) => {
-  const id = req.user.id;
-  try{
-    const result = await db.query(`SELECT 
-        tp.id,
-        b.judul AS judul,
-        tp.tgl_pengajuan,
-        tp.tgl_kembali_rencana,
-        tp.tgl_kembali_aktual,
-        tp.status
-      FROM transaksi_peminjaman tp
-      JOIN buku b ON tp.buku_id = b.id
-      WHERE tp.peminjam_id = $1;`, [id]);
+  try {
+    const result = await db.query(
+      `SELECT tp.id, b.judul, tp.tgl_pengajuan, tp.tgl_kembali_rencana,
+              tp.tgl_kembali_aktual, tp.status
+       FROM transaksi_peminjaman tp
+       JOIN buku b ON tp.buku_id = b.id
+       WHERE tp.peminjam_id = $1`,
+      [req.user.id]
+    );
     const nama = req.user?.nama || 'Pengguna';
-    res.render("peminjam/riwayat", {
+    res.render('peminjam/riwayat', {
       peminjaman: result.rows,
       user: req.user,
       nama
     });
-  } catch (err){
-    console.log("ERROR: ", err.message);
+  } catch (err) {
+    console.error('ERROR riwayat:', err.message);
+    res.status(500).send('Terjadi kesalahan server');
   }
 });
 
 router.get('/akun', auth, async (req, res) => {
   try {
-    const id = req.user.id;
+    const result = await db.query(
+      'SELECT nomor_induk, nama, tipe, kelas, email, created_at FROM peminjam WHERE id=$1',
+      [req.user.id]
+    );
+    if (!result.rows.length)
+      return res.status(404).send('User tidak ditemukan');
 
-    const result = await db.query(`
-      SELECT nomor_induk, nama, tipe, kelas, email, created_at
-      FROM peminjam
-      WHERE id = $1
-    `, [id]);
-
-    if (!result.rows.length) {
-      return res.send("User tidak ditemukan");
-    }
-
-    const nama = req.user?.nama || result.rows[0]?.nama || 'Pengguna';
+    const nama = req.user?.nama || result.rows[0].nama;
     res.render('peminjam/akun', {
       user: result.rows[0],
       nama
     });
-
   } catch (err) {
-    console.log(err);
-    res.send("Error");
+    console.error('ERROR akun:', err.message);
+    res.status(500).send('Terjadi kesalahan server');
   }
 });
 

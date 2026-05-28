@@ -51,8 +51,8 @@
       <div class="sidebar-user">
         <div class="sidebar-user-avatar" id="sidebar-avatar">U</div>
         <div class="sidebar-user-info">
-          <div class="sidebar-user-name" id="sidebar-name">Pengguna</div>
-          <div class="sidebar-user-role" id="sidebar-role">Siswa</div>
+          <div class="sidebar-user-name" id="sidebar-name">Memuat...</div>
+          <div class="sidebar-user-role" id="sidebar-role"></div>
         </div>
       </div>
       <a href="/api/peminjam/logout" class="btn-logout">
@@ -361,14 +361,14 @@ function closeSidebar() {
   (async function() {
     try {
       const res = await fetch('/api/peminjam/me', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        const nama = data.nama || 'Pengguna';
-        const kelas = data.kelas || '';
-        document.getElementById('sidebar-name').textContent = nama;
-        document.getElementById('sidebar-avatar').textContent = nama.charAt(0).toUpperCase();
-        document.getElementById('sidebar-role').textContent = kelas ? kelas + ' · Siswa' : 'Siswa';
-      }
+      if (!res.ok) { window.location.href = '/peminjam/login'; return; }
+      const data = await res.json();
+      const nama  = data.nama  || 'Pengguna';
+      const kelas = data.kelas || '';
+      const label = data.tipe === 'guru' ? 'Guru' : 'Siswa';
+      document.getElementById('sidebar-name').textContent   = nama;
+      document.getElementById('sidebar-avatar').textContent = nama.charAt(0).toUpperCase();
+      document.getElementById('sidebar-role').textContent   = kelas ? kelas + ' \u00b7 ' + label : label;
     } catch(e) {}
   })();
 </script>

@@ -12,55 +12,76 @@
   <!-- Sidebar -->
   <aside class="sidebar" id="peminjam-sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="8" fill="#F97316"/>
-          <path d="M16 6C16 6 8 10 8 18C8 22.418 11.582 26 16 26C20.418 26 24 22.418 24 18C24 10 16 6 16 6Z" fill="white" fill-opacity="0.9"/>
-          <path d="M16 10C16 10 11 13 11 18C11 20.761 13.239 23 16 23C18.761 23 21 20.761 21 18C21 13 16 10 16 10Z" fill="#F97316"/>
-        </svg>
-      </div>
-      <div>
-        <div class="sidebar-name">SMA PESAT</div>
-        <div class="sidebar-sub">School of Talent</div>
-      </div>
+      <img src="/assets/js/logo-sma-pesat.png" alt="SMA PESAT" class="sidebar-logo-img">
+      <span class="sidebar-brand-tagline">Sistem Perpustakaan</span>
     </div>
     <nav class="sidebar-nav">
-      <div class="sidebar-section-label">Menu Utama</div>
+      <div class="sidebar-section-label">Menu</div>
       <a href="/api/peminjam/dashboard" class="nav-item" data-page="beranda">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
+          <path d="M9 21V12h6v9"/>
+        </svg>
         Beranda
       </a>
       <a href="/api/peminjam/katalog" class="nav-item active" data-page="katalog">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+          <line x1="10" y1="7" x2="16" y2="7"/>
+          <line x1="10" y1="11" x2="14" y2="11"/>
+        </svg>
         Katalog
       </a>
       <a href="/peminjam/ebook.html" class="nav-item" data-page="ebook">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z" clip-rule="evenodd"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <path d="M12 4v16M8 8h2M8 12h2"/>
+        </svg>
         E-Book
       </a>
       <a href="/api/peminjam/antrianSaya" class="nav-item" data-page="antrian">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="9" y1="6"  x2="20" y2="6"/>
+          <line x1="9" y1="12" x2="20" y2="12"/>
+          <line x1="9" y1="18" x2="20" y2="18"/>
+          <circle cx="4" cy="6"  r="1" fill="currentColor" stroke="none"/>
+          <circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="4" cy="18" r="1" fill="currentColor" stroke="none"/>
+        </svg>
         Antrian
       </a>
       <a href="/api/peminjam/riwayat" class="nav-item" data-page="riwayat">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <polyline points="12 7 12 12 15 15"/>
+        </svg>
         Riwayat
       </a>
       <a href="/api/peminjam/akun" class="nav-item" data-page="akun">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
         Akun
       </a>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="topbar-avatar" id="sidebar-avatar" style="width:32px;height:32px;font-size:12px;">U</div>
-          <div>
-            <div class="sidebar-user-name" id="sidebar-name">Memuat...</div>
-            <div class="sidebar-user-role" id="sidebar-role">Perpustakaan PESAT</div>
-          </div>
+        <div class="sidebar-user-avatar" id="sidebar-avatar">U</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-name">Memuat...</div>
+          <div class="sidebar-user-role" id="sidebar-role"></div>
         </div>
       </div>
+      <a href="/api/peminjam/logout" class="btn-logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Keluar
+      </a>
     </div>
   </aside>
 
@@ -79,7 +100,7 @@
       <div class="topbar-actions">
         <div class="topbar-user-info">
           <div class="topbar-user-name" id="topbar-name">—</div>
-          <div class="topbar-user-role" id="topbar-role">Siswa</div>
+          <div class="topbar-user-role" id="topbar-role"></div>
         </div>
         <div class="topbar-avatar" id="topbar-avatar">U</div>
       </div>
@@ -178,25 +199,38 @@
     .then(data => {
       document.getElementById('book-title').textContent = data.judul || 'Buku';
       document.getElementById('book-author').textContent = data.pengarang || '';
+
+      // Render cover buku
+      const coverWrap = document.getElementById('book-cover-wrap');
+      if (data.cover) {
+        coverWrap.innerHTML = `<img src="${data.cover}" alt="${data.judul}"
+          style="width:100%;max-width:120px;border-radius:8px;object-fit:cover;display:block;">`;
+      }
+      // Jika tidak ada cover, placeholder gray box tetap tampil
     })
     .catch(() => {
       document.getElementById('book-title').textContent = 'Buku';
     });
 
-  // Fetch user info from dashboard endpoint
-  fetch('/api/peminjam/dashboard', { redirect: 'manual' })
-    .catch(() => {});
-
-  // Try to get user info from cookie/session via a profile endpoint
-  fetch('/api/peminjam/akun')
+  // Fetch nama user dari endpoint yang benar
+  fetch('/api/peminjam/me')
     .then(res => {
       if (!res.ok) throw new Error('Not logged in');
-      return res.text();
+      return res.json();
     })
-    .then(html => {
-      // Parse nama from the page if available - fallback to generic
+    .then(user => {
+      const nama = user.nama || 'Pengguna';
+      const inisial = nama.charAt(0).toUpperCase();
+      document.getElementById('nama-display').value = nama;
+      document.getElementById('sidebar-name').textContent = nama;
+      document.getElementById('sidebar-role').textContent = user.kelas ? `${user.kelas} · ${user.tipe === 'guru' ? 'Guru' : 'Siswa'}` : (user.tipe === 'guru' ? 'Guru' : 'Siswa');
+      document.getElementById('sidebar-avatar').textContent = inisial;
+      document.getElementById('topbar-name').textContent = nama;
+      document.getElementById('topbar-avatar').textContent = inisial;
     })
-    .catch(() => {});
+    .catch(() => {
+      window.location.href = '/peminjam/login';
+    });
 
   // Validate max 7 days
   tglKembali.addEventListener('change', function() {

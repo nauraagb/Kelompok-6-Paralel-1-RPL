@@ -28,9 +28,11 @@ router.get('/', auth, async (req, res) => {
 
 // GET /api/peminjaman/:id
 router.get('/:id', auth, async (req, res) => {
-  const { rows } = await db.query(`${JOIN} WHERE tp.id=$1`, [req.params.id]);
-  if (!rows.length) return res.status(404).json({ message: 'Data tidak ditemukan' });
-  res.json(rows[0]);
+  try {
+    const { rows } = await db.query(`${JOIN} WHERE tp.id=$1`, [req.params.id]);
+    if (!rows.length) return res.status(404).json({ message: 'Data tidak ditemukan' });
+    res.json(rows[0]);
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 // POST /api/peminjaman  – buat pengajuan baru
@@ -138,23 +140,19 @@ router.put('/:id/kembalikan', auth, async (req, res) => {
       [req.user.id, req.params.id]
     );
 
-    // kalau ADA antrian
+    // kalau ADA antrian — stok langsung dialihkan ke peminjam berikutnya
     if (antrian.rows.length) {
 
+      // Langsung set 'dipinjam' (stok tidak perlu berubah, dialihkan langsung)
       await client.query(
         `INSERT INTO transaksi_peminjaman
-        (peminjam_id, buku_id, tgl_kembali_rencana, status, catatan)
-        VALUES ($1, $2, CURRENT_DATE + 14, 'menunggu', 'Dari antrian')`,
-        [
-          antrian.rows[0].peminjam_id,
-          rows[0].buku_id
-        ]
+        (peminjam_id, buku_id, tgl_pinjam, tgl_kembali_rencana, status, catatan, admin_id)
+        VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE + 14, 'dipinjam', 'Dari antrian', $3)`,
+        [antrian.rows[0].peminjam_id, rows[0].buku_id, req.user.id]
       );
 
       await client.query(
-        `UPDATE antrian
-         SET status='diproses'
-         WHERE id=$1`,
+        `UPDATE antrian SET status='diproses' WHERE id=$1`,
         [antrian.rows[0].id]
       );
 

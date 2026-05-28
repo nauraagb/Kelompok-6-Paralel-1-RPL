@@ -47,15 +47,19 @@ router.get('/', auth, async (req, res) => {
 
 // GET /api/buku/kategori – daftar kategori unik
 router.get('/kategori', auth, async (req, res) => {
-  const { rows } = await db.query("SELECT DISTINCT kategori FROM buku WHERE kategori IS NOT NULL ORDER BY kategori");
-  res.json(rows.map(r => r.kategori));
+  try {
+    const { rows } = await db.query("SELECT DISTINCT kategori FROM buku WHERE kategori IS NOT NULL ORDER BY kategori");
+    res.json(rows.map(r => r.kategori));
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 // GET /api/buku/:id
 router.get('/:id', auth, async (req, res) => {
-  const { rows } = await db.query('SELECT * FROM buku WHERE id=$1', [req.params.id]);
-  if (!rows.length) return res.status(404).json({ message: 'Buku tidak ditemukan' });
-  res.json(rows[0]);
+  try {
+    const { rows } = await db.query('SELECT * FROM buku WHERE id=$1', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ message: 'Buku tidak ditemukan' });
+    res.json(rows[0]);
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 // POST /api/buku
@@ -131,7 +135,7 @@ router.put('/:id', auth, upload.single('cover'), async (req, res) => {
        kategori=$6,jumlah_stok=$7,stok_tersedia=$8,cover=$9 WHERE id=$10 RETURNING *`,
       [judul||b.judul, pengarang??b.pengarang, penerbit??b.penerbit,
        tahun_terbit??b.tahun_terbit, isbn??b.isbn, kategori??b.kategori,
-       stokBaru, tersedia, req.params.id]
+       stokBaru, tersedia, cover, req.params.id]
     );
     res.json(rows[0]);
   } catch (err) { res.status(500).json({ message: err.message }); }
@@ -139,29 +143,25 @@ router.put('/:id', auth, upload.single('cover'), async (req, res) => {
 
 // DELETE /api/buku/:id
 router.delete('/:id', auth, async (req, res) => {
-  const old = await db.query(
-  'SELECT * FROM buku WHERE id=$1',
-  [req.params.id]
-);
-
-if (old.rows.length && old.rows[0].cover) {
-      const imgPath = path.join(
-        process.cwd(),
-        'frontend',
-        old.rows[0].cover
-      );
-
-      if (fs.existsSync(imgPath)) {
-        fs.unlinkSync(imgPath);
-      }
-    }
   try {
+    const old = await db.query('SELECT * FROM buku WHERE id=$1', [req.params.id]);
+    if (!old.rows.length)
+      return res.status(404).json({ message: 'Buku tidak ditemukan' });
+
+    // Cek dulu apakah buku sedang dipinjam sebelum hapus apapun
     const check = await db.query(
       "SELECT COUNT(*) FROM transaksi_peminjaman WHERE buku_id=$1 AND status='dipinjam'",
       [req.params.id]
     );
     if (parseInt(check.rows[0].count) > 0)
       return res.status(400).json({ message: 'Buku sedang dipinjam, tidak bisa dihapus' });
+
+    // Aman untuk dihapus — hapus file cover dulu kalau ada
+    if (old.rows[0].cover) {
+      const imgPath = path.join(process.cwd(), 'frontend', old.rows[0].cover);
+      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+    }
+
     await db.query('DELETE FROM buku WHERE id=$1', [req.params.id]);
     res.json({ message: 'Buku berhasil dihapus' });
   } catch (err) { res.status(500).json({ message: err.message }); }
@@ -185,23 +185,25 @@ router.post('/import', auth, upload.single('file'), async (req, res) => {
   parser.on('error', (err) => res.status(400).json({ message: 'Format CSV tidak valid: ' + err.message }));
   parser.on('end', async () => {
     let inserted = 0, skipped = 0;
-    for (const r of records) {
-      if (!r.judul) { skipped++; continue; }
-      const stok = parseInt(r.jumlah_stok) || 1;
-      try {
-        await db.query(
-          `INSERT INTO buku (judul,pengarang,penerbit,tahun_terbit,isbn,kategori,jumlah_stok,stok_tersedia)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$7)`,
-          [r.judul, r.pengarang||null, r.penerbit||null, r.tahun_terbit||null,
-           r.isbn||null, r.kategori||null, stok]
-        );
-        inserted++;
-        if (fs.existsSync(req.file.path)) {
-          fs.unlinkSync(req.file.path);
-        }
-      } catch { skipped++; }
+    try {
+      for (const r of records) {
+        if (!r.judul) { skipped++; continue; }
+        const stok = parseInt(r.jumlah_stok) || 1;
+        try {
+          await db.query(
+            `INSERT INTO buku (judul,pengarang,penerbit,tahun_terbit,isbn,kategori,jumlah_stok,stok_tersedia)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$7)`,
+            [r.judul, r.pengarang||null, r.penerbit||null, r.tahun_terbit||null,
+             r.isbn||null, r.kategori||null, stok]
+          );
+          inserted++;
+        } catch { skipped++; }
+      }
+      res.json({ message: `Import selesai: ${inserted} berhasil, ${skipped} dilewati`, inserted, skipped });
+    } finally {
+      // Hapus file temp SEKALI setelah seluruh loop selesai
+      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     }
-    res.json({ message: `Import selesai: ${inserted} berhasil, ${skipped} dilewati`, inserted, skipped });
   });
 });
 

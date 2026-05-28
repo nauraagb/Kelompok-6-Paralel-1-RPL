@@ -82,7 +82,12 @@
           <%= typeof nama !== 'undefined' ? nama : (typeof user !== 'undefined' && user.nama ? user.nama : 'Pengguna') %>
         </div>
         <div class="sidebar-user-role">
-          <%= typeof user !== 'undefined' && user.kelas ? user.kelas + ' · Siswa' : 'Siswa' %>
+          <%
+            const _tipe = (typeof user !== 'undefined' && user.tipe) ? user.tipe : 'siswa';
+            const _label = _tipe === 'guru' ? 'Guru' : 'Siswa';
+            const _kelas = (typeof user !== 'undefined' && user.kelas) ? user.kelas : '';
+          %>
+          <%= _kelas ? _kelas + ' · ' + _label : _label %>
         </div>
       </div>
     </div>
