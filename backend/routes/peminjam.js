@@ -445,10 +445,11 @@ router.get("/riwayat", auth, async(req, res) => {
   try {
     const result = await db.query(
       `SELECT tp.id, b.judul, tp.tgl_pengajuan, tp.tgl_kembali_rencana,
-              tp.tgl_kembali_aktual, tp.status
+              tp.tgl_kembali_aktual, tp.status, tp.catatan
        FROM transaksi_peminjaman tp
        JOIN buku b ON tp.buku_id = b.id
-       WHERE tp.peminjam_id = $1`,
+       WHERE tp.peminjam_id = $1
+       ORDER BY tp.tgl_pengajuan DESC`,
       [req.user.id]
     );
     const nama = req.user?.nama || 'Pengguna';

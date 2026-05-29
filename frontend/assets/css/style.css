@@ -1445,9 +1445,9 @@ tr:hover td { background: #FAFBFC; }
   animation: toastIn .25s ease;
   max-width: 320px;
 }
-.toast-success { background: #F0FDF4; border-left: 3px solid var(--success); color: #166534; }
-.toast-error   { background: #FEF2F2; border-left: 3px solid var(--danger);  color: #991B1B; }
-.toast-info    { background: #EFF6FF; border-left: 3px solid var(--info);    color: #1E40AF; }
+.toast-success { background: #F0FDF4; color: #166534; }
+.toast-error   { background: #FEF2F2; color: #991B1B; }
+.toast-info    { background: #EFF6FF; color: #1E40AF; }
 @keyframes toastIn { from { opacity:0; transform: translateX(16px); } to { opacity:1; transform: translateX(0); } }
 
 /* ─────────────────────────────────────────

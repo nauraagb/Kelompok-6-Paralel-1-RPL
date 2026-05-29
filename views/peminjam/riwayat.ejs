@@ -81,8 +81,16 @@
                     else if (row.status === 'dikembalikan') badgeClass = 'status-dikembalikan';
                     else if (row.status === 'terlambat') badgeClass = 'status-terlambat';
                     else if (row.status === 'batal') badgeClass = 'status-batal';
+                    else if (row.status === 'ditolak') badgeClass = 'status-ditolak';
+                    else if (row.status === 'selesai') badgeClass = 'status-selesai';
                   %>
                   <span class="status-badge <%= badgeClass %>"><%= row.status %></span>
+                  <% if (row.status === 'ditolak' && row.catatan) { %>
+                  <button class="btn-alasan" onclick="lihatAlasan(this)" data-alasan="<%= row.catatan %>">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Lihat alasan
+                  </button>
+                  <% } %>
                 </td>
               </tr>
               <% }); %>
@@ -94,9 +102,106 @@
     </div>
   </main>
 </div>
+<style>
+  .btn-alasan {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .btn-alasan:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+  }
+
+  #modal-alasan {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-alasan.open { display: flex; }
+  #modal-alasan .modal-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 24px 20px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  }
+  #modal-alasan .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #modal-alasan .modal-title span { color: var(--danger, #dc2626); font-size: 20px; }
+  #modal-alasan .modal-body {
+    background: #fef2f2;
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: #7f1d1d;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  #modal-alasan .modal-footer {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  #modal-alasan .btn-tutup {
+    padding: 8px 20px;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #modal-alasan .btn-tutup:hover { background: #e5e7eb; }
+</style>
+
+<!-- Modal Alasan Penolakan -->
+<div id="modal-alasan">
+  <div class="modal-box">
+    <div class="modal-title"><span></span> Alasan Penolakan</div>
+    <div class="modal-body" id="modal-alasan-text"></div>
+    <div class="modal-footer">
+      <button class="btn-tutup" onclick="tutupAlasan()">Tutup</button>
+    </div>
+  </div>
+</div>
+
 <script>
   document.querySelectorAll('.nav-item[data-page]').forEach(el => {
     if (el.dataset.page === 'riwayat') el.classList.add('active');
+  });
+
+  function lihatAlasan(btn) {
+    document.getElementById('modal-alasan-text').textContent = btn.dataset.alasan;
+    document.getElementById('modal-alasan').classList.add('open');
+  }
+  function tutupAlasan() {
+    document.getElementById('modal-alasan').classList.remove('open');
+  }
+  document.getElementById('modal-alasan').addEventListener('click', function(e) {
+    if (e.target === this) tutupAlasan();
   });
 </script>
 </body>
