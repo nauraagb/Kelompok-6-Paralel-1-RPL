@@ -235,14 +235,19 @@
   btn.disabled = true;
 
   try {
+     const token = API.getToken();
+
     const res = await fetch(
-      id ? `/api/buku/${id}` : '/api/buku',
-      {
-        method: id ? 'PUT' : 'POST',
-        body: fd,
-        credentials: 'include'
-      }
-    );
+    id ? `/api/buku/${id}` : '/api/buku',
+    {
+      method: id ? 'PUT' : 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: fd
+    }
+  );
+
 
     const data = await res.json();
 

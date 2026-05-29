@@ -150,6 +150,29 @@
     }
     renderPagination('pagination', data.total, page, 20, 'loadData');
   }
+function toggleSidebar() {
+  document
+    .getElementById('peminjam-sidebar')
+    .classList.toggle('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.toggle('show');
+
+  document.body.classList.toggle('sidebar-open');
+}
+
+function closeSidebar() {
+  document
+    .getElementById('peminjam-sidebar')
+    .classList.remove('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.remove('show');
+
+  document.body.classList.remove('sidebar-open');
+}
 
   function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadData(1), 400); }
 

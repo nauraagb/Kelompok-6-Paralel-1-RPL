@@ -147,6 +147,30 @@
     window.open(`/api/laporan/pdf?dari=${dari}&sampai=${sampai}&token=${token}`, '_blank');
   }
 
+  function toggleSidebar() {
+  document
+    .getElementById('peminjam-sidebar')
+    .classList.toggle('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.toggle('show');
+
+  document.body.classList.toggle('sidebar-open');
+}
+
+function closeSidebar() {
+  document
+    .getElementById('peminjam-sidebar')
+    .classList.remove('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.remove('show');
+
+  document.body.classList.remove('sidebar-open');
+}
+
   loadLaporan();
 </script>
 <script>

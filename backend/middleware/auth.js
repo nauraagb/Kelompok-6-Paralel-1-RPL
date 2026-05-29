@@ -4,12 +4,19 @@ function authMiddleware(req, res, next) {
   const header = req.headers['authorization'];
   let token = null;
 
+  // Bearer token
   if (header && header.startsWith('Bearer ')) {
     token = header.slice(7);
   }
 
-  if (!token && req.cookies.token) {
+  // Cookie
+  if (!token && req.cookies?.token) {
     token = req.cookies.token;
+  }
+
+  // Query param (?token=...)
+  if (!token && req.query.token) {
+    token = req.query.token;
   }
 
   if (!token) {
@@ -24,5 +31,6 @@ function authMiddleware(req, res, next) {
     return res.status(401).json({ message: 'Token tidak valid' });
   }
 }
+
 
 module.exports = authMiddleware;

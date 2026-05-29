@@ -18,6 +18,32 @@ function iconDashboard() {
     <rect x="3" y="14" width="7" height="7" rx="1.5"/>
   </svg>`;
 }
+
+function toggleSidebar() {
+  document
+    .getElementById('sidebar')
+    .classList.toggle('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.toggle('show');
+
+  document.body.classList.toggle('sidebar-open');
+}
+
+function closeSidebar() {
+  document
+    .getElementById('sidebar')
+    .classList.remove('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.remove('show');
+
+  document.body.classList.remove('sidebar-open');
+}
+
+
 function iconBook() {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>

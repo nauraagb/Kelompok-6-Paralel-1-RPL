@@ -124,6 +124,30 @@
 <script src="/assets/js/api.js"></script>
 <script src="/assets/js/sidebar.js"></script>
 <script>
+  function toggleSidebar() {
+  document
+    .getElementById('peminjam-sidebar')
+    .classList.toggle('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.toggle('show');
+
+  document.body.classList.toggle('sidebar-open');
+}
+
+function closeSidebar() {
+  document
+    .getElementById('peminjam-sidebar')
+    .classList.remove('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.remove('show');
+
+  document.body.classList.remove('sidebar-open');
+}
+
   initSidebar('peminjam');
   let currentPage = 1, searchTimer;
 

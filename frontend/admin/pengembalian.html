@@ -61,6 +61,30 @@
 
   document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') loadData(1); });
 
+  function toggleSidebar() {
+  document
+    .getElementById('peminjam-sidebar')
+    .classList.toggle('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.toggle('show');
+
+  document.body.classList.toggle('sidebar-open');
+}
+
+function closeSidebar() {
+  document
+    .getElementById('peminjam-sidebar')
+    .classList.remove('open');
+
+  document
+    .getElementById('sidebar-overlay')
+    .classList.remove('show');
+
+  document.body.classList.remove('sidebar-open');
+}
+
   async function loadData(page = 1) {
     currentPage = page;
     const q = document.getElementById('q').value.trim();

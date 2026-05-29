@@ -51,7 +51,7 @@
   document.getElementById('password').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
   });
-
+  
   async function doLogin() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
