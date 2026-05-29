@@ -103,12 +103,6 @@ router.get('/', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// GET /api/peminjam/:id
-// router.get('/:id', auth, async (req, res) => {
-//   const { rows } = await db.query('SELECT * FROM peminjam WHERE id=$1', [req.params.id]);
-//   if (!rows.length) return res.status(404).json({ message: 'Peminjam tidak ditemukan' });
-//   res.json(rows[0]);
-// });
 
 // POST /api/peminjam
 router.post('/', auth, async (req, res) => {
@@ -131,14 +125,23 @@ router.post('/', auth, async (req, res) => {
 
 // PUT /api/peminjam/:id
 router.put('/:id', auth, async (req, res) => {
-  const { nomor_induk, nama, tipe, kelas, email } = req.body;
+  const { nomor_induk, nama, tipe, kelas, email, password } = req.body;
   try {
     const old = await db.query('SELECT * FROM peminjam WHERE id=$1', [req.params.id]);
     if (!old.rows.length) return res.status(404).json({ message: 'Peminjam tidak ditemukan' });
     const p = old.rows[0];
+
+    // Kalau password dikirim, hash dulu; kalau tidak, pakai yang lama
+    let hashPassword = p.password;
+    if (password && password.trim()) {
+      const salt = await bcrypt.genSalt(10);
+      hashPassword = await bcrypt.hash(password.trim(), salt);
+    }
+
     const { rows } = await db.query(
-      'UPDATE peminjam SET nomor_induk=$1,nama=$2,tipe=$3,kelas=$4,email=$5 WHERE id=$6 RETURNING *',
-      [nomor_induk||p.nomor_induk, nama||p.nama, tipe||p.tipe, kelas??p.kelas, email??p.email, req.params.id]
+      'UPDATE peminjam SET nomor_induk=$1,nama=$2,tipe=$3,kelas=$4,email=$5,password=$6 WHERE id=$7 RETURNING *',
+      [nomor_induk||p.nomor_induk, nama||p.nama, tipe||p.tipe,
+       kelas??p.kelas, email??p.email, hashPassword, req.params.id]
     );
     res.json(rows[0]);
   } catch (err) {
@@ -478,6 +481,15 @@ router.get('/akun', auth, async (req, res) => {
     console.error('ERROR akun:', err.message);
     res.status(500).send('Terjadi kesalahan server');
   }
+});
+
+// GET /api/peminjam/:id — harus di paling bawah agar tidak menimpa route bernama di atas
+router.get('/:id', auth, async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM peminjam WHERE id=$1', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ message: 'Peminjam tidak ditemukan' });
+    res.json(rows[0]);
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 module.exports = router;

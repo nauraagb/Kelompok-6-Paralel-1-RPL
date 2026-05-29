@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
+<button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()">&#9776;</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div class="app-layout">
   <aside id="sidebar" class="sidebar"></aside>
   <main class="main-content">
@@ -195,6 +197,18 @@
       </tr>`).join('');
   }
   loadDashboard();
+</script>
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+  document.body.classList.toggle('sidebar-open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+  document.body.classList.remove('sidebar-open');
+}
 </script>
 </body>
 </html>

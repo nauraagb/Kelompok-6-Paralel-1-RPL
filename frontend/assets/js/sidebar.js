@@ -92,7 +92,6 @@ function initSidebar(activePage) {
   const initial = (user?.nama || 'A').charAt(0).toUpperCase();
 
   document.getElementById('sidebar').innerHTML = `
-    <div class="sidebar">
       <div class="sidebar-header">
         <img src="/assets/js/logo-sma-pesat.png" alt="SMA PESAT" class="sidebar-logo-img">
         <span class="sidebar-brand-tagline">Sistem Perpustakaan</span>
@@ -113,8 +112,7 @@ function initSidebar(activePage) {
           ${iconLogout()}
           Keluar
         </button>
-      </div>
-    </div>`;
+      </div>`;
 }
 
 function doLogout() {

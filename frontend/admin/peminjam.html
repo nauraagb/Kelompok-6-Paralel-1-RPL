@@ -6,8 +6,10 @@
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
+<button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()">&#9776;</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div class="app-layout">
-  <aside id="sidebar"></aside>
+  <aside id="sidebar" class="sidebar"></aside>
   <main class="main-content">
     <div class="topbar">
       <span class="topbar-title">Data Peminjam</span>
@@ -162,6 +164,7 @@
     document.getElementById('rec-id').value = '';
     ['nomor','nama','kelas','email','password'].forEach(f => document.getElementById('f-'+f).value = '');
     document.getElementById('f-tipe').value = 'siswa';
+    document.getElementById('f-password').placeholder = 'nama00x';
     document.getElementById('form-modal').classList.add('open');
   }
 
@@ -175,7 +178,8 @@
     document.getElementById('f-tipe').value    = d.tipe;
     document.getElementById('f-kelas').value   = d.kelas || '';
     document.getElementById('f-email').value   = d.email || '';
-    document.getElementById('f-password').value = d.password;
+    document.getElementById('f-password').value = '';
+    document.getElementById('f-password').placeholder = 'Kosongkan jika tidak ingin mengubah password';
     document.getElementById('form-modal').classList.add('open');
   }
 
@@ -190,7 +194,8 @@
       password: document.getElementById('f-password').value
     };
     if (!body.nomor_induk || !body.nama) { Toast.error('Nomor induk dan nama wajib diisi'); return; }
-    if (!body.password) { Toast.error('Password wajib diisi'); return;}
+    if (!id && !body.password) { Toast.error('Password wajib diisi'); return; }
+    if (!body.password) delete body.password; // kosong saat edit = tidak diubah
     const btn = document.getElementById('save-btn');
     btn.disabled = true;
     try {
@@ -233,6 +238,18 @@
 
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
   loadData();
+</script>
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+  document.body.classList.toggle('sidebar-open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+  document.body.classList.remove('sidebar-open');
+}
 </script>
 </body>
 </html>
