@@ -323,8 +323,8 @@
           </div>
         </div>
 
-        <!-- MANUAL token input (always visible below main state) -->
-        <div class="card manual-section" style="margin-top:24px">
+      
+        <!-- <div class="card manual-section" style="margin-top:24px">
           <div class="card-body">
             <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:10px">
               Input Token Manual
@@ -335,7 +335,7 @@
               <button class="btn btn-primary" onclick="loadFromManual()">Verifikasi</button>
             </div>
           </div>
-        </div>
+        </div> -->
 
       </div>
     </div>
@@ -349,7 +349,6 @@
 
   let currentToken = null;
 
-  // ── On load: read token from URL query string ──
   window.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const token  = params.get('token');
@@ -371,7 +370,7 @@
   // ── Load + verify token from backend ──
   async function loadToken(token) {
     currentToken = token;
-    document.getElementById('manual-token').value = token;
+    // document.getElementById('manual-token').value = token;
     showState('loading');
 
     try {
@@ -434,7 +433,7 @@
 
   function scanLagi() {
     currentToken = null;
-    document.getElementById('manual-token').value = '';
+    // document.getElementById('manual-token').value = '';
     // Clear URL token param without reload
     const url = new URL(window.location);
     url.searchParams.delete('token');
@@ -442,11 +441,11 @@
     showState('idle');
   }
 
-  function loadFromManual() {
-    const t = document.getElementById('manual-token').value.trim();
-    if (!t) { Toast.error('Masukkan token terlebih dahulu'); return; }
-    loadToken(t);
-  }
+  // function loadFromManual() {
+  //   const t = document.getElementById('manual-token').value.trim();
+  //   if (!t) { Toast.error('Masukkan token terlebih dahulu'); return; }
+  //   loadToken(t);
+  // }
 
   // ── Camera & QR scanning ──
   let cameraStream  = null;
