@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Scan QR Peminjaman — Perpustakaan SMA Pesat Bogor</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <script src="/vendor/jsqr/jsQR.js"></script>
+  <style>
+    /* ── Scan result card ── */
+    .scan-wrapper {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* state cards */
+    .state-card {
+      display: none;
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .state-card.visible { display: block; }
+
+    /* idle – waiting for token */
+    #state-idle {
+      background: var(--bg-secondary);
+      border: 2px dashed var(--border);
+    }
+    .idle-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+      opacity: .5;
+    }
+    .idle-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .idle-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* loading spinner */
+    #state-loading {
+      background: var(--bg-secondary);
+    }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* preview card – show details before approving */
+    #state-preview {
+      background: var(--white);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      text-align: left;
+      padding: 32px;
+    }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-heading { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+    .preview-sub     { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .detail-item label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .detail-item span {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .detail-item.full { grid-column: 1 / -1; }
+
+    /* success state */
+    #state-success {
+      background: var(--success-lt);
+      border: 1px solid var(--success);
+    }
+    .success-icon { font-size: 64px; margin-bottom: 16px; }
+    .success-title {
+      font-size: 22px; font-weight: 700;
+      color: var(--success-dk);
+      margin-bottom: 8px;
+    }
+    .success-name {
+      font-size: 15px; font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .success-book {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    /* error state */
+    #state-error {
+      background: var(--danger-lt);
+      border: 1px solid var(--danger);
+    }
+    .error-icon  { font-size: 56px; margin-bottom: 16px; }
+    .error-title { font-size: 20px; font-weight: 700; color: var(--danger-dk); margin-bottom: 8px; }
+    .error-msg   { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; }
+
+    /* manual token input */
+    .manual-section {
+      margin-top: 24px;
+    }
+    .manual-section .card-header { border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
+
+    /* ── Camera ── */
+    .camera-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      background: #000;
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    #qr-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .scan-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .scan-frame {
+      width: 60%;
+      aspect-ratio: 1;
+      border: 3px solid var(--primary);
+      border-radius: 12px;
+      box-shadow: 0 0 0 9999px rgba(0,0,0,.45);
+    }
+    .scan-frame::before, .scan-frame::after,
+    .scan-frame > span::before, .scan-frame > span::after {
+      content: '';
+      position: absolute;
+      width: 24px; height: 24px;
+      border-color: var(--primary);
+      border-style: solid;
+    }
+    .scan-pulse {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%; aspect-ratio: 1;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      opacity: .5;
+      animation: pulse 1.8s ease-out infinite;
+    }
+    @keyframes pulse {
+      0%   { transform: translate(-50%,-50%) scale(1);   opacity: .5; }
+      100% { transform: translate(-50%,-50%) scale(1.18); opacity: 0; }
+    }
+    .scan-hint-overlay {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.6);
+      color: #fff;
+      font-size: 12px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    #camera-idle-prompt {
+      padding: 20px 0 8px;
+    }
+    #camera-active { display: none; }
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()">&#9776;</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="app-layout">
+  <aside id="sidebar" class="sidebar"></aside>
+  <main class="main-content">
+    <div class="topbar">
+      <span class="topbar-title">Scan QR Peminjaman</span>
+    </div>
+    <div class="page-body">
+      <div class="scan-wrapper">
+
+        <!-- IDLE: no token in URL -->
+        <div class="state-card" id="state-idle">
+
+          <!-- Before camera opened -->
+          <div id="camera-idle-prompt">
+            <div class="idle-icon"></div>
+            <div class="idle-title">Scan QR Peminjaman</div>
+            <div class="idle-hint">Klik tombol di bawah untuk membuka kamera,<br>lalu arahkan ke QR code peminjam.</div>
+            <button class="btn btn-primary" onclick="startCamera()" style="margin-top:8px">
+              &nbsp; Buka Kamera
+            </button>
+          </div>
+
+          <!-- Camera active -->
+          <div id="camera-active">
+            <div class="camera-container">
+              <video id="qr-video" autoplay playsinline muted></video>
+              <canvas id="qr-canvas" style="display:none"></canvas>
+              <div class="scan-overlay">
+                <div class="scan-frame"></div>
+                <div class="scan-pulse"></div>
+              </div>
+              <div class="scan-hint-overlay">Arahkan ke QR code</div>
+            </div>
+            <button class="btn btn-secondary" onclick="stopCamera()" style="width:100%">
+              ⏹&nbsp; Hentikan Kamera
+            </button>
+          </div>
+
+        </div>
+
+        <!-- LOADING -->
+        <div class="state-card" id="state-loading">
+          <div class="spinner"></div>
+          <div style="color:var(--text-secondary);font-size:15px">Memverifikasi QR…</div>
+        </div>
+
+        <!-- PREVIEW: show details before approving -->
+        <div class="state-card" id="state-preview">
+          <div class="preview-header">
+            <div>
+              <div class="preview-heading">Peminjaman Disetujui</div>
+              <div class="preview-sub">QR valid, peminjaman otomatis disetujui</div>
+            </div>
+          </div>
+
+          <div class="detail-grid">
+            <div class="detail-item full">
+              <label>Buku</label>
+              <span id="d-judul" style="font-size:16px"></span>
+            </div>
+            <div class="detail-item">
+              <label>Pengarang</label>
+              <span id="d-pengarang"></span>
+            </div>
+            <div class="detail-item">
+              <label>Stok Tersedia</label>
+              <span id="d-stok"></span>
+            </div>
+            <div class="detail-item full">
+              <label>Peminjam</label>
+              <span id="d-nama" style="font-size:16px"></span>
+            </div>
+            <div class="detail-item">
+              <label>Nomor Induk</label>
+              <span id="d-nomor"></span>
+            </div>
+            <div class="detail-item">
+              <label>Kelas / Tipe</label>
+              <span id="d-kelas"></span>
+            </div>
+            <div class="detail-item">
+              <label>Tanggal Pengajuan</label>
+              <span id="d-tgl-pengajuan"></span>
+            </div>
+            <div class="detail-item">
+              <label>Batas Kembali</label>
+              <span id="d-tgl-kembali"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="state-card" id="state-success">
+          <div class="success-icon">✅</div>
+          <div class="success-title">Peminjaman Disetujui!</div>
+          <div class="success-name" id="s-nama"></div>
+          <div class="success-book" id="s-judul"></div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="scanLagi()">Scan QR Lainnya</button>
+            <a href="/admin/peminjaman.html" class="btn btn-secondary">Lihat Daftar Peminjaman</a>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <div class="state-card" id="state-error">
+          <div class="error-icon">❌</div>
+          <div class="error-title">QR Tidak Valid</div>
+          <div class="error-msg" id="error-msg"></div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-secondary" onclick="scanLagi()">Coba Lagi</button>
+            <a href="/admin/peminjaman.html" class="btn btn-primary">Kembali ke Peminjaman</a>
+          </div>
+        </div>
+
+        <!-- MANUAL token input (always visible below main state) -->
+        <div class="card manual-section" style="margin-top:24px">
+          <div class="card-body">
+            <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:10px">
+              Input Token Manual
+            </div>
+            <div class="toolbar">
+              <input type="text" id="manual-token" class="form-control flex-1"
+                     placeholder="Tempel token QR di sini…">
+              <button class="btn btn-primary" onclick="loadFromManual()">Verifikasi</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/sidebar.js"></script>
+<script>
+  initSidebar('peminjaman');
+
+  let currentToken = null;
+
+  // ── On load: read token from URL query string ──
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get('token');
+    if (token) {
+      loadToken(token);
+    } else {
+      showState('idle');
+    }
+  });
+
+  // ── State management ──
+  function showState(name) {
+    if (name !== 'idle' && cameraStream) stopCamera();
+    ['idle','loading','preview','success','error'].forEach(s => {
+      document.getElementById('state-' + s).classList.toggle('visible', s === name);
+    });
+  }
+
+  // ── Load + verify token from backend ──
+  async function loadToken(token) {
+    currentToken = token;
+    document.getElementById('manual-token').value = token;
+    showState('loading');
+
+    try {
+      const res  = await API.get(`/peminjaman/scan?token=${encodeURIComponent(token)}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError(data.message || 'Token tidak valid');
+        return;
+      }
+
+      // Fill preview
+      document.getElementById('d-judul').textContent         = data.buku_judul;
+      document.getElementById('d-pengarang').textContent     = data.pengarang;
+      document.getElementById('d-stok').textContent          = `${data.stok_tersedia} eksemplar`;
+      document.getElementById('d-nama').textContent          = data.peminjam_nama;
+      document.getElementById('d-nomor').textContent         = data.nomor_induk;
+      document.getElementById('d-kelas').textContent         = [data.kelas, data.peminjam_tipe].filter(Boolean).join(' · ');
+      document.getElementById('d-tgl-pengajuan').textContent = fmtDate(data.tgl_pengajuan);
+      document.getElementById('d-tgl-kembali').textContent   = fmtDate(data.tgl_kembali_rencana);
+
+      await approvePeminjaman();
+    } catch (err) {
+      showError('Gagal menghubungi server');
+    }
+  }
+
+  // ── Approve ──
+  async function approvePeminjaman() {
+    const btn = document.getElementById('approve-btn') || { disabled: false, textContent: '' };
+    if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Memproses…';
+
+    try {
+      const res  = await API.put('/peminjaman/scan', { token: currentToken });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError(data.message || 'Gagal menyetujui peminjaman');
+        btn.disabled = false;
+        btn.textContent = '✓ Setujui Peminjaman';
+        return;
+      }
+
+      showState('preview');
+      currentToken = null;
+    } catch (err) {
+      showError('Gagal menghubungi server');
+      btn.disabled = false;
+      btn.textContent = '✓ Setujui Peminjaman';
+    }
+  }
+  }
+
+  function showError(msg) {
+    document.getElementById('error-msg').textContent = msg;
+    showState('error');
+  }
+
+  function scanLagi() {
+    currentToken = null;
+    document.getElementById('manual-token').value = '';
+    // Clear URL token param without reload
+    const url = new URL(window.location);
+    url.searchParams.delete('token');
+    window.history.replaceState({}, '', url);
+    showState('idle');
+  }
+
+  function loadFromManual() {
+    const t = document.getElementById('manual-token').value.trim();
+    if (!t) { Toast.error('Masukkan token terlebih dahulu'); return; }
+    loadToken(t);
+  }
+
+  // ── Camera & QR scanning ──
+  let cameraStream  = null;
+  let scanRafId     = null;
+
+  async function startCamera() {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } }
+      });
+      const video = document.getElementById('qr-video');
+      video.srcObject = cameraStream;
+      await video.play();
+
+      if (typeof jsQR !== 'function') {
+        stopCamera();
+        showError('Scanner QR belum siap. Pastikan file jsQR lokal tersedia, lalu refresh halaman.');
+        return;
+      }
+
+      document.getElementById('camera-idle-prompt').style.display = 'none';
+      document.getElementById('camera-active').style.display = 'block';
+
+      scanRafId = requestAnimationFrame(scanFrame);
+    } catch (err) {
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        Toast.error('Akses kamera ditolak. Izinkan akses kamera di pengaturan browser.');
+      } else if (err.name === 'NotFoundError') {
+        Toast.error('Kamera tidak ditemukan di perangkat ini.');
+      } else {
+        Toast.error('Tidak dapat membuka kamera: ' + err.message);
+      }
+    }
+  }
+
+  function stopCamera() {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      cameraStream = null;
+    }
+    if (scanRafId) {
+      cancelAnimationFrame(scanRafId);
+      scanRafId = null;
+    }
+    document.getElementById('camera-idle-prompt').style.display = 'block';
+    document.getElementById('camera-active').style.display = 'none';
+  }
+
+  function scanFrame() {
+    const video  = document.getElementById('qr-video');
+    const canvas = document.getElementById('qr-canvas');
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: 'attemptBoth'
+      });
+
+      if (code && code.data) {
+        stopCamera();
+        loadToken(extractTokenFromQr(code.data));
+        return;
+      }
+    }
+
+    scanRafId = requestAnimationFrame(scanFrame);
+  }
+
+  function extractTokenFromQr(raw) {
+    const value = String(raw || '').trim();
+
+    try {
+      const parsed = new URL(value, window.location.origin);
+      const token = parsed.searchParams.get('token');
+      if (token) return token.trim();
+    } catch {}
+    return value;
+  }
+</script>
+</body>
+</html>

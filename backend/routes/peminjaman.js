@@ -11,6 +11,110 @@ const JOIN = `
   JOIN buku     b ON b.id = tp.buku_id
 `;
 
+// GET /api/peminjaman/scan  – preview detail pengajuan via QR token
+router.get('/scan', auth, async (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).json({ message: 'Token QR tidak ditemukan' });
+
+  try {
+    const { rows } = await db.query(
+      `SELECT tp.id, tp.status, tp.tgl_pengajuan, tp.tgl_kembali_rencana, tp.qr_expired_at,
+              p.nama AS peminjam_nama, p.nomor_induk, p.kelas, p.tipe AS peminjam_tipe,
+              b.judul AS buku_judul, b.pengarang, b.stok_tersedia
+       FROM transaksi_peminjaman tp
+       JOIN peminjam p ON p.id = tp.peminjam_id
+       JOIN buku     b ON b.id = tp.buku_id
+       WHERE tp.qr_token = $1`,
+      [token]
+    );
+
+    if (!rows.length)
+      return res.status(404).json({ message: 'QR tidak valid atau sudah digunakan' });
+
+    const tx = rows[0];
+    if (tx.status !== 'menunggu')
+      return res.status(400).json({ message: `Pengajuan ini sudah berstatus: ${tx.status}` });
+    if (tx.qr_expired_at && new Date(tx.qr_expired_at) < new Date())
+      return res.status(400).json({ message: 'QR sudah kadaluarsa (lebih dari 24 jam)' });
+
+    res.json(tx);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// PUT /api/peminjaman/scan  – setujui otomatis via QR token
+router.put('/scan', auth, async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ message: 'Token QR tidak ditemukan' });
+
+  const client = await require('../db').connect();
+  try {
+    await client.query('BEGIN');
+
+    // Cari transaksi berdasarkan QR token, kunci baris
+    const { rows } = await client.query(
+      `SELECT * FROM transaksi_peminjaman WHERE qr_token=$1 FOR UPDATE`,
+      [token]
+    );
+
+    if (!rows.length)
+      throw new Error('QR tidak valid atau sudah pernah digunakan');
+
+    const tx = rows[0];
+
+    if (tx.status !== 'menunggu')
+      throw new Error(`Pengajuan ini sudah berstatus: ${tx.status}`);
+
+    if (tx.qr_expired_at && new Date(tx.qr_expired_at) < new Date())
+      throw new Error('QR sudah kadaluarsa (lebih dari 24 jam)');
+
+    // Cek dan kunci stok buku
+    const buku = await client.query(
+      'SELECT stok_tersedia FROM buku WHERE id=$1 FOR UPDATE',
+      [tx.buku_id]
+    );
+    if (buku.rows[0].stok_tersedia < 1)
+      throw new Error('Stok buku habis, tidak bisa disetujui');
+
+    // Kurangi stok
+    await client.query(
+      'UPDATE buku SET stok_tersedia=stok_tersedia-1 WHERE id=$1',
+      [tx.buku_id]
+    );
+
+    // Setujui transaksi + hapus token agar tidak bisa dipakai ulang
+    const updated = await client.query(
+      `UPDATE transaksi_peminjaman
+       SET status='dipinjam', tgl_pinjam=CURRENT_DATE, admin_id=$1, qr_token=NULL, qr_expired_at=NULL
+       WHERE id=$2
+       RETURNING *`,
+      [req.user.id, tx.id]
+    );
+
+    await client.query('COMMIT');
+
+    // Ambil detail lengkap untuk response
+    const detail = await require('../db').query(
+      `SELECT tp.*, p.nama AS peminjam_nama, p.nomor_induk, p.kelas, p.tipe AS peminjam_tipe,
+              b.judul AS buku_judul, b.pengarang
+       FROM transaksi_peminjaman tp
+       JOIN peminjam p ON p.id = tp.peminjam_id
+       JOIN buku     b ON b.id = tp.buku_id
+       WHERE tp.id=$1`,
+      [updated.rows[0].id]
+    );
+
+    res.json({ message: 'Peminjaman berhasil disetujui', data: detail.rows[0] });
+
+  } catch (err) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ message: err.message });
+  } finally {
+    client.release();
+  }
+});
+
 // GET /api/peminjaman
 router.get('/', auth, async (req, res) => {
   const { status, q, page = 1, limit = 20 } = req.query;

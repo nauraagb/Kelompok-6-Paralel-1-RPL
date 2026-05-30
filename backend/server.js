@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Static frontend files
+app.use('/vendor/jsqr', express.static(path.join(__dirname, '../node_modules/jsqr/dist')));
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));

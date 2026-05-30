@@ -3,8 +3,7 @@
 -- Schema PostgreSQL — v2
 -- =============================================================
 
-CREATE DATABASE IF NOT EXISTS perpustakaan_sma;
-\c perpustakaan_sma;
+CREATE DATABASE perpustakaan_sma;
 
 -- -------------------------------------------------------------
 -- USERS (admin)
