@@ -93,9 +93,14 @@
             <option value="Geografi">Geografi</option>
             <option value="Ekonomi">Ekonomi</option>
             <option value="Informatika">Informatika</option>
-            <option value="Novel">Sastra</option>
+            <option value="Sastra">Sastra</option>
+            <option value="Novel">Novel</option>
             <option value="Komik">Komik</option>
+            <option value="__custom__">+ Kategori lain...</option>
           </select>
+          <input type="text" id="f-kategori-custom" class="form-control"
+                 placeholder="Tulis nama kategori..."
+                 style="margin-top:8px;display:none;">
         </div>
         <div class="form-group">
           <label class="form-label">Jumlah Stok</label>
@@ -194,6 +199,8 @@
     document.getElementById('modal-title').textContent = 'Tambah Buku';
     document.getElementById('buku-id').value = '';
     ['judul','pengarang','penerbit','tahun','isbn','kategori'].forEach(f => document.getElementById('f-'+f).value = '');
+    document.getElementById('f-kategori-custom').value = '';
+    document.getElementById('f-kategori-custom').style.display = 'none';
     document.getElementById('f-stok').value = 1;
     document.getElementById('form-modal').classList.add('open');
   }
@@ -208,7 +215,18 @@
     document.getElementById('f-penerbit').value = b.penerbit || '';
     document.getElementById('f-tahun').value    = b.tahun_terbit || '';
     document.getElementById('f-isbn').value     = b.isbn || '';
-    document.getElementById('f-kategori').value = b.kategori || '';
+    const _known = ['Matematika','Fisika','Kimia','Biologi','Bahasa Indonesia',
+                    'Bahasa Inggris','Sejarah','Geografi','Ekonomi','Informatika',
+                    'Sastra','Novel','Komik',''];
+    const _bukuKat = b.kategori || '';
+    if (_known.includes(_bukuKat)) {
+      document.getElementById('f-kategori').value = _bukuKat;
+      document.getElementById('f-kategori-custom').style.display = 'none';
+    } else {
+      document.getElementById('f-kategori').value = '__custom__';
+      document.getElementById('f-kategori-custom').value = _bukuKat;
+      document.getElementById('f-kategori-custom').style.display = 'block';
+    }
     document.getElementById('f-stok').value     = b.jumlah_stok || 1;
     document.getElementById('form-modal').classList.add('open');
   }
@@ -223,7 +241,9 @@
   fd.append('penerbit', document.getElementById('f-penerbit').value.trim());
   fd.append('tahun_terbit', document.getElementById('f-tahun').value);
   fd.append('isbn', document.getElementById('f-isbn').value.trim());
-  fd.append('kategori', document.getElementById('f-kategori').value.trim());
+  const _kat = document.getElementById('f-kategori').value;
+  const _katCustom = document.getElementById('f-kategori-custom').value.trim();
+  fd.append('kategori', _kat === '__custom__' ? _katCustom : _kat);
   fd.append('jumlah_stok', document.getElementById('f-stok').value);
 
   const cover = document.getElementById('f-cover').files[0];
@@ -299,6 +319,17 @@
 
   loadKategori();
   loadBuku();
+
+  document.getElementById('f-kategori').addEventListener('change', function() {
+    const inp = document.getElementById('f-kategori-custom');
+    if (this.value === '__custom__') {
+      inp.style.display = 'block';
+      inp.focus();
+    } else {
+      inp.style.display = 'none';
+      inp.value = '';
+    }
+  });
 </script>
 <script>
 function toggleSidebar() {

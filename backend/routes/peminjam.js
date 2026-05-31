@@ -52,7 +52,7 @@ router.post('/login', async (req, res) => {
 });
 
 
-// GET /api/peminjam/me - return current user info (for static HTML pages like ebook.html)
+// GET /api/peminjam/me - 
 router.get('/me', auth, async (req, res) => {
   try {
     const { rows } = await db.query(
@@ -240,27 +240,21 @@ router.get('/formaja', auth, async (req, res) => {
 
 router.get('/katalog', auth, async (req, res) => {
   try {
-    const result = await db.query(`
-      SELECT 
-        id,
-        judul,
-        pengarang,
-        penerbit,
-        isbn,
-        tahun_terbit,
-        jumlah_stok,
-        stok_tersedia,
-        kategori,
-        cover
-      FROM buku
-      ORDER BY judul ASC
-    `);
+    const [result, katResult] = await Promise.all([
+      db.query(`
+        SELECT id, judul, pengarang, penerbit, isbn, tahun_terbit,
+               jumlah_stok, stok_tersedia, kategori, cover
+        FROM buku ORDER BY judul ASC
+      `),
+      db.query(`SELECT DISTINCT kategori FROM buku WHERE kategori IS NOT NULL ORDER BY kategori`)
+    ]);
     const nama = req.user?.nama || 'Pengguna';
     res.render('peminjam/katalog', {
       buku: result.rows,
       results: [],
       keyword: '',
       kategori: '',
+      kategoriList: katResult.rows.map(r => r.kategori),
       user: req.user,
       nama
     });
@@ -346,11 +340,13 @@ router.get('/searchBook', auth, async(req, res) => {
 
     results = query.rows;
 
+    const katResult = await db.query(`SELECT DISTINCT kategori FROM buku WHERE kategori IS NOT NULL ORDER BY kategori`);
     const nama = req.user?.nama || 'Pengguna';
     res.render("peminjam/katalog", {
       results,
       keyword,
       kategori,
+      kategoriList: katResult.rows.map(r => r.kategori),
       user: req.user,
       nama
     });

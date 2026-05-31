@@ -49,36 +49,12 @@
     <!-- RIGHT FILTER -->
     <div class="search-right">
 
-      <select name="kategori" class="genre-select">
-
-        <option value="">Semua Genre</option>
-
-        <option value="Novel"
-          <%= kategori === 'Novel' ? 'selected' : '' %>>
-          Novel
-        </option>
-
-        <option value="Teknologi"
-          <%= kategori === 'Teknologi' ? 'selected' : '' %>>
-          Teknologi
-        </option>
-
-        <option value="Sejarah"
-          <%= kategori === 'Sejarah' ? 'selected' : '' %>>
-          Sejarah
-        </option>
-
-        <option value="Sains"
-          <%= kategori === 'Sains' ? 'selected' : '' %>>
-          Sains
-        </option>
-
-        <option value="Pendidikan"
-          <%= kategori === 'Pendidikan' ? 'selected' : '' %>>
-          Pendidikan
-        </option>
-
-      </select>
+      <select name="kategori" class="genre-select" onchange="this.form.submit()">
+  <option value="">Semua Kategori</option>
+  <% (kategoriList || []).forEach(function(k) { %>
+    <option value="<%= k %>" <%= kategori === k ? 'selected' : '' %>><%= k %></option>
+  <% }); %>
+</select>
 
       <button type="submit"
               class="btn btn-primary btn-sm">
