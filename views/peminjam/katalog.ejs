@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Katalog Buku — Perpustakaan SMA PESAT</title>
+  <title>Katalog | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -42,7 +42,7 @@
         value="<%= typeof keyword !== 'undefined'
           ? keyword
           : '' %>"
-        placeholder="Cari Koleksi..."
+        placeholder="Cari koleksi..."
       >
     </div>
 
@@ -103,7 +103,7 @@
         <div class="katalog-toolbar">
           <% if (typeof keyword !== 'undefined' && keyword) { %>
           <span class="badge badge-orange">Hasil pencarian: "<%= keyword %>"</span>
-          <a href="/api/peminjam/katalog" class="btn btn-secondary btn-sm">Tampilkan Semua</a>
+          <a href="/api/peminjam/katalog" class="btn btn-secondary btn-sm">Reset</a>
           <% } %>
           <span class="text-muted text-sm"><%= dataBuku.length %> buku ditemukan</span>
         </div>
@@ -112,12 +112,12 @@
       <!-- No results -->
       <% if (dataBuku.length === 0) { %>
       <div class="empty-state">
-        <div class="empty-state-icon">📚</div>
-        <h3>Tidak ada buku ditemukan</h3>
+        <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <h3>Buku tidak ditemukan</h3>
         <% if (typeof keyword !== 'undefined' && keyword) { %>
         <p>Tidak ada hasil untuk "<%= keyword %>". Coba kata kunci lain.</p>
         <% } else { %>
-        <p>Belum ada buku di katalog.</p>
+        <p>Katalog masih kosong.</p>
         <% } %>
       </div>
       <% } else { %>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — Perpustakaan SMA PESAT</title>
+  <title>Beranda | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
           </svg>
         </span>
         <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
-          <input type="text" name="q" placeholder="Cari koleksi buku...">
+          <input type="text" name="q" placeholder="Cari koleksi...">
         </form>
       </div>
       <div class="topbar-actions">
@@ -39,7 +39,7 @@
       <div class="welcome-banner">
         <div class="welcome-banner-body">
           <h2>Halo, <%= nama %>!</h2>
-          <p>Selamat datang di Perpustakaan SMA PESAT. Temukan koleksi buku terbaik untuk kamu.</p>
+          <p>Mau baca apa hari ini?</p>
         </div>
       </div>
 
@@ -56,7 +56,7 @@
             </svg>
           </div>
           <div class="action-card-label">Katalog Buku</div>
-          <div class="action-card-desc">Jelajahi koleksi perpustakaan</div>
+          <div class="action-card-desc">Cari dan lihat koleksi buku</div>
         </a>
 
         <a href="/api/peminjam/riwayat" class="action-card">
@@ -67,7 +67,7 @@
             </svg>
           </div>
           <div class="action-card-label">Riwayat Pinjaman</div>
-          <div class="action-card-desc">Lihat buku yang pernah dipinjam</div>
+          <div class="action-card-desc">Cek buku yang pernah kamu pinjam</div>
         </a>
 
         <a href="/api/peminjam/antrianSaya" class="action-card">
@@ -82,7 +82,7 @@
             </svg>
           </div>
           <div class="action-card-label">Antrian Saya</div>
-          <div class="action-card-desc">Pantau status antrian buku</div>
+          <div class="action-card-desc">Lihat posisi antrianmu</div>
         </a>
 
         <a href="/api/peminjam/akun" class="action-card">
@@ -93,7 +93,7 @@
             </svg>
           </div>
           <div class="action-card-label">Akun Saya</div>
-          <div class="action-card-desc">Lihat dan kelola profil</div>
+          <div class="action-card-desc">Info akun kamu</div>
         </a>
 
       </div>
@@ -115,7 +115,7 @@
               </div>
               <div>
                 <div class="info-item-title">Jam Operasional</div>
-                <div class="info-item-desc">Sen–Jum: 07.30 – 15.30</div>
+                <div class="info-item-desc">Sen-Jum, 07.30-15.30</div>
               </div>
             </div>
 
@@ -130,7 +130,7 @@
               </div>
               <div>
                 <div class="info-item-title">Masa Pinjam</div>
-                <div class="info-item-desc">Maksimal 7 hari per buku</div>
+                <div class="info-item-desc">Maks. 7 hari per buku</div>
               </div>
             </div>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Tiket Peminjaman — Perpustakaan SMA PESAT</title>
+  <title>Tiket QR | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -19,7 +19,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
         </span>
-        <input type="text" placeholder="Cari Koleksi...">
+        <input type="text" placeholder="Cari koleksi...">
       </div>
       <div class="topbar-actions">
       </div>
@@ -36,8 +36,8 @@
             </svg>
           </div>
           <div>
-            <div class="qr-alert-title">Buku tersedia! Segera ambil ke perpustakaan</div>
-            <div class="qr-alert-sub">Tunjukkan tiket QR Code kepada Admin di meja perpustakaan untuk validasi.</div>
+            <div class="qr-alert-title">Buku siap! Segera ke perpustakaan ya</div>
+            <div class="qr-alert-sub">Tunjukkan QR ini ke admin perpustakaan.</div>
           </div>
         </div>
         <div class="qr-timer">
@@ -66,7 +66,7 @@
             </div>
             <div class="qr-step-num">Langkah 1</div>
             <div class="qr-step-title">Buka tiket ini</div>
-            <div class="qr-step-desc">Simpan atau screenshot halaman tiket digital ini</div>
+            <div class="qr-step-desc">Screenshot atau simpan halaman ini</div>
           </div>
 
           <div class="qr-step">
@@ -77,7 +77,7 @@
             </div>
             <div class="qr-step-num">Langkah 2</div>
             <div class="qr-step-title">Datang ke perpustakaan</div>
-            <div class="qr-step-desc">Kunjungi perpustakaan</div>
+            <div class="qr-step-desc">Pergi ke perpustakaan sekolah</div>
           </div>
 
           <div class="qr-step">
@@ -88,7 +88,7 @@
             </div>
             <div class="qr-step-num">Langkah 3</div>
             <div class="qr-step-title">Temui admin</div>
-            <div class="qr-step-desc">Cari meja admin dan tunjukkan kode QR kamu</div>
+            <div class="qr-step-desc">Tunjukkan QR ini ke admin di meja piket</div>
           </div>
 
           <div class="qr-step">
@@ -99,7 +99,7 @@
             </div>
             <div class="qr-step-num">Langkah 4</div>
             <div class="qr-step-title">Validasi</div>
-            <div class="qr-step-desc">Admin scan QR dan menyerahkan bukunya ke kamu</div>
+            <div class="qr-step-desc">Admin scan QR, buku langsung diserahkan</div>
           </div>
         </div>
       </div>
@@ -135,7 +135,7 @@
       totalSeconds--;
       setTimeout(updateTimer, 1000);
     } else {
-      document.getElementById('countdown').textContent = 'Kedaluwarsa';
+      document.getElementById('countdown').textContent = 'Expired';
     }
   }
   updateTimer();

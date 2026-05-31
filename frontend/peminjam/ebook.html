@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-Book — Perpustakaan SMA PESAT</title>
+  <title>E-Book | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
       <img src="/assets/js/logo-sma-pesat.png" alt="SMA PESAT" class="sidebar-logo-img">
-      <span class="sidebar-brand-tagline">Sistem Perpustakaan</span>
+      <span class="sidebar-brand-tagline">Perpustakaan SMA PESAT</span>
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-section-label">Menu</div>
@@ -103,7 +103,7 @@
           <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
             <div class="form-group flex-1" style="margin-bottom:0;min-width:200px;">
               <label class="form-label">Kata Kunci</label>
-              <input id="q2" type="text" class="form-control" placeholder="Contoh: Sherlock Holmes, Pride and Prejudice…"
+              <input id="q2" type="text" class="form-control" placeholder="cth: Laskar Pelangi, Harry Potter..."
                 onkeydown="if(event.key==='Enter') { document.getElementById('q').value=this.value; doSearch(1); }">
             </div>
             <div class="form-group" style="margin-bottom:0;">
@@ -267,7 +267,7 @@ function closeSidebar() {
   // ── Detail Modal ────────────────────────────────────────────────
   async function showDetail(id) {
     document.getElementById('detail-modal').classList.add('open');
-    document.getElementById('detail-title').textContent = 'Memuat…';
+    document.getElementById('detail-title').textContent = 'Memuat...';
     document.getElementById('detail-body').innerHTML =
       '<div class="loading-overlay"><div class="spinner"></div></div>';
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antrian Saya — Perpustakaan SMA PESAT</title>
+  <title>Antrian Saya | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
           </svg>
         </span>
         <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
-          <input type="text" name="q" placeholder="Cari Koleksi...">
+          <input type="text" name="q" placeholder="Cari koleksi...">
         </form>
       </div>
       <div class="topbar-actions">
@@ -35,7 +35,7 @@
         <div class="card-header">
           <div>
             <span class="card-title">Daftar Antrian Buku</span>
-            <div class="text-muted text-sm" style="margin-top:3px;">Buku yang sedang Anda tunggu karena stok habis.</div>
+            <div class="text-muted text-sm" style="margin-top:3px;">Buku yang stoknya habis dan kamu lagi nunggu giliran.</div>
           </div>
           <span class="badge badge-gray"><%= antrian.length %> antrian</span>
         </div>
@@ -54,7 +54,7 @@
               </svg>
             </div>
             <h3>Tidak ada antrian aktif</h3>
-            <p>Anda belum memiliki antrian buku saat ini.</p>
+            <p>Kamu belum daftar antrian buku apapun.</p>
             <a href="/api/peminjam/katalog" class="btn btn-primary btn-sm" style="margin-top:12px;">Lihat Katalog</a>
           </div>
         </div>
@@ -76,7 +76,7 @@
                 <td>
                   <span class="badge badge-blue">#<%= item.nomor_antrian %></span>
                 </td>
-                <td style="font-weight:600;"><%= item.judul || '—' %></td>
+                <td style="font-weight:600;"><%= item.judul || '-' %></td>
                 <td class="text-muted">
                   <%= new Date(item.tgl_daftar).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
                 </td>
@@ -108,13 +108,13 @@
   });
 
   async function batalkanAntrian(id) {
-    if (!confirm('Yakin ingin membatalkan antrian ini?')) return;
+    if (!confirm('Yakin mau batalkan antrian ini?')) return;
     try {
       const res = await fetch(`/api/antrian/${id}`, { method: 'DELETE' });
       if (res.ok) { window.location.reload(); }
-      else { alert('Gagal membatalkan antrian.'); }
+      else { alert('Gagal batalkan antrian. Coba lagi.'); }
     } catch (err) {
-      alert('Terjadi kesalahan jaringan.');
+      alert('Koneksi bermasalah, coba lagi.');
     }
   }
 </script>

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Kelola Buku — Perpustakaan SMA Pesat Bogor</title>
+  <title>Kelola Buku | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -24,7 +24,7 @@
           <div class="toolbar">
             <div class="search-input">
               <span class="search-icon"></span>
-              <input id="q" type="text" class="form-control" placeholder="Cari judul atau pengarang…" oninput="debounceSearch()" style="padding-left:34px">
+              <input id="q" type="text" class="form-control" placeholder="Cari judul atau pengarang..." oninput="debounceSearch()" style="padding-left:34px">
             </div>
             <select id="kat" class="form-control" style="width:160px" onchange="loadBuku(1)">
               <option value="">Semua Kategori</option>
@@ -170,9 +170,9 @@
       tbody.innerHTML = data.data.map(b => `
         <tr>
           <td><strong>${b.judul}</strong></td>
-          <td>${b.pengarang || '—'}</td>
-          <td>${b.penerbit || '—'}</td>
-          <td>${b.tahun_terbit || '—'}</td>
+          <td>${b.pengarang || '-'}</td>
+          <td>${b.penerbit || '-'}</td>
+          <td>${b.tahun_terbit || '-'}</td>
           <td>${b.kategori ? `<span class="badge badge-orange">${b.kategori}</span>` : '—'}</td>
           <td>${b.jumlah_stok}</td>
           <td><span class="badge ${b.stok_tersedia > 0 ? 'badge-green' : 'badge-red'}">${b.stok_tersedia}</span></td>

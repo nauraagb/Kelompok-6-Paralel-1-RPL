@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Laporan — Perpustakaan SMA Pesat Bogor</title>
+  <title>Laporan | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -114,7 +114,7 @@
       pb.innerHTML = data.bukuTerpopuler.map((b, i) => `
         <tr>
           <td>${i === 0 ? '#1' : i === 1 ? '#2' : i === 2 ? '#3' : (i+1)+'.'} ${b.judul}</td>
-          <td>${b.pengarang || '—'}</td>
+          <td>${b.pengarang || '-'}</td>
           <td><span class="badge badge-orange">${b.jumlah}×</span></td>
         </tr>`).join('');
     }

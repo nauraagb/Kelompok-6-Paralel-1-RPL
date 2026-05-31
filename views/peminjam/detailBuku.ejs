@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= detail.judul %> — Perpustakaan SMA PESAT</title>
+  <title><%= detail.judul %> | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
           </svg>
         </span>
         <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
-          <input type="text" name="q" placeholder="Cari Koleksi...">
+          <input type="text" name="q" placeholder="Cari koleksi...">
         </form>
       </div>
       <div class="topbar-actions">
@@ -39,7 +39,7 @@
         </a>
       </div>
 
-      <h1 class="page-title">Informasi Buku</h1>
+      <h1 class="page-title">Detail Buku</h1>
 
       <div class="detail-hero">
         <!-- Book Cover -->
@@ -53,7 +53,7 @@
             >
           <% } else { %>
             <div class="detail-cover-placeholder">
-              Tidak Ada Cover
+              No Cover
             </div>
           <% } %>
           </div>
@@ -65,7 +65,7 @@
 
           <!-- Stock Badge -->
           <% if (detail.stok_tersedia > 0) { %>
-          <div class="detail-stock-badge available">Stok Tersedia: <%= detail.stok_tersedia %> buku</div>
+          <div class="detail-stock-badge available">Stok: <%= detail.stok_tersedia %> buku</div>
           <% } else { %>
           <div class="detail-stock-badge empty">Stok Habis</div>
           <% } %>
@@ -74,15 +74,15 @@
           <div class="detail-grid">
             <div class="detail-field">
               <span class="detail-field-label">ISBN</span>
-              <span class="detail-field-value"><%= detail.isbn || '—' %></span>
+              <span class="detail-field-value"><%= detail.isbn || '-' %></span>
             </div>
             <div class="detail-field">
               <span class="detail-field-label">Edisi</span>
-              <span class="detail-field-value">—</span>
+              <span class="detail-field-value">-</span>
             </div>
             <div class="detail-field">
               <span class="detail-field-label">Tahun Terbit</span>
-              <span class="detail-field-value"><%= detail.tahun_terbit || '—' %></span>
+              <span class="detail-field-value"><%= detail.tahun_terbit || '-' %></span>
             </div>
             <div class="detail-field">
               <span class="detail-field-label">Bahasa</span>
@@ -90,15 +90,15 @@
             </div>
             <div class="detail-field">
               <span class="detail-field-label">Halaman</span>
-              <span class="detail-field-value">—</span>
+              <span class="detail-field-value">-</span>
             </div>
             <div class="detail-field">
               <span class="detail-field-label">Kategori</span>
-              <span class="detail-field-value"><%= detail.kategori || '—' %></span>
+              <span class="detail-field-value"><%= detail.kategori || '-' %></span>
             </div>
             <div class="detail-field">
               <span class="detail-field-label">Kode Rak</span>
-              <span class="detail-field-value">—</span>
+              <span class="detail-field-value">-</span>
             </div>
             <div class="detail-field">
               <span class="detail-field-label">Jumlah Eksemplar</span>
@@ -135,7 +135,7 @@
           </div>
           <div>
             <div style="font-size:11px;font-weight:600;color:var(--text-sm);text-transform:uppercase;letter-spacing:.04em;">Pengarang</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);"><%= detail.pengarang || '—' %></div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);"><%= detail.pengarang || '-' %></div>
           </div>
           <% if (detail.penerbit) { %>
           <div style="margin-left:24px;">

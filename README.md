@@ -123,7 +123,7 @@ npm start
 
 **Login default admin:**
 - Username: `admin`
-- Password: `admin123`
+- Password: `password`
 
 > ⚠️ Segera ganti password setelah login pertama!
 

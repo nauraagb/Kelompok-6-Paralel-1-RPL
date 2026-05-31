@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Data Peminjam — Perpustakaan SMA Pesat Bogor</title>
+  <title>Data Peminjam | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -24,7 +24,7 @@
           <div class="toolbar">
             <div class="search-input">
               <span class="search-icon"></span>
-              <input id="q" type="text" class="form-control" placeholder="Cari nama atau nomor induk…" oninput="debounceSearch()" style="padding-left:34px">
+              <input id="q" type="text" class="form-control" placeholder="Cari nama atau nomor induk..." oninput="debounceSearch()" style="padding-left:34px">
             </div>
             <select id="tipe" class="form-control" style="width:140px" onchange="loadData(1)">
               <option value="">Semua Tipe</option>
@@ -170,8 +170,8 @@ function closeSidebar() {
           <td><code>${d.nomor_induk}</code></td>
           <td><strong>${d.nama}</strong></td>
           <td><span class="badge ${d.tipe==='guru'?'badge-blue':'badge-orange'}">${d.tipe}</span></td>
-          <td>${d.kelas || '—'}</td>
-          <td>${d.email || '—'}</td>
+          <td>${d.kelas || '-'}</td>
+          <td>${d.email || '-'}</td>
           <td>
             <button class="btn btn-secondary btn-sm" onclick="openEditModal(${d.id})">Edit</button>
             <button class="btn btn-danger btn-sm" onclick="deleteData(${d.id},'${d.nama.replace(/'/g,"\\'")}')">Hapus</button>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Akun Saya — Perpustakaan SMA PESAT</title>
+  <title>Akun Saya | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -20,13 +20,13 @@
           </svg>
         </span>
         <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
-          <input type="text" name="q" placeholder="Cari Koleksi...">
+          <input type="text" name="q" placeholder="Cari koleksi...">
         </form>
       </div>
       <div class="topbar-actions">
         <div class="topbar-user-info">
           <div class="topbar-user-name"><%= user.nama %></div>
-          <div class="topbar-user-role"><%= user.kelas ? user.kelas + ' · ' + user.tipe : user.tipe %></div>
+          <div class="topbar-user-role"><%= user.kelas ? user.kelas + ' Â· ' + user.tipe : user.tipe %></div>
         </div>
         <div class="topbar-avatar"><%= user.nama.charAt(0).toUpperCase() %></div>
       </div>
@@ -42,7 +42,7 @@
           <div class="profile-avatar"><%= user.nama.charAt(0).toUpperCase() %></div>
           <div>
             <div class="profile-name"><%= user.nama %></div>
-            <div class="profile-role"><%= user.kelas ? user.kelas + ' · ' : '' %><%= user.tipe %></div>
+            <div class="profile-role"><%= user.kelas ? user.kelas + ' Â· ' : '' %><%= user.tipe %></div>
           </div>
         </div>
 
@@ -57,21 +57,21 @@
             <div class="profile-field-value"><%= user.nama %></div>
           </div>
           <div class="profile-field">
-            <div class="profile-field-label">Tipe Pengguna</div>
+            <div class="profile-field-label">Tipe</div>
             <div class="profile-field-value">
               <span class="badge badge-orange"><%= user.tipe %></span>
             </div>
           </div>
           <div class="profile-field">
             <div class="profile-field-label">Kelas</div>
-            <div class="profile-field-value"><%= user.kelas || '—' %></div>
+            <div class="profile-field-value"><%= user.kelas || '-' %></div>
           </div>
           <div class="profile-field">
             <div class="profile-field-label">Email</div>
-            <div class="profile-field-value"><%= user.email || '—' %></div>
+            <div class="profile-field-value"><%= user.email || '-' %></div>
           </div>
           <div class="profile-field">
-            <div class="profile-field-label">Bergabung Sejak</div>
+            <div class="profile-field-label">Terdaftar Sejak</div>
             <div class="profile-field-value">
               <%= new Date(user.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %>
             </div>

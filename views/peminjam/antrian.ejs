@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ajukan Antrian — Perpustakaan SMA PESAT</title>
+  <title>Ajukan Antrian | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
           </svg>
         </span>
         <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
-          <input type="text" name="q" placeholder="Cari Koleksi...">
+          <input type="text" name="q" placeholder="Cari koleksi...">
         </form>
       </div>
     </div>
@@ -45,16 +45,16 @@
           <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0;margin-top:1px;">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
           </svg>
-          Stok buku sedang habis. Kamu bisa mendaftar antrian dan akan diberitahu ketika buku tersedia.
+          Stok habis. Daftar antrian dulu, nanti kamu dikabarin kalau bukunya udah ada.
         </div>
 
         <!-- Confirm Card -->
         <div class="card">
           <div class="card-body" style="text-align:center;padding:40px 28px;">
-            <div style="font-size:56px;margin-bottom:16px;">⏳</div>
+            <div style="margin-bottom:16px;color:var(--text-muted);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></div>
             <h2 style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Daftarkan Diri ke Antrian?</h2>
             <p style="font-size:13px;color:var(--text-sm);line-height:1.6;margin-bottom:28px;">
-              Anda akan mendapatkan nomor antrian. Kami akan memberi tahu Anda ketika buku tersedia untuk dipinjam.
+              Kamu akan dapat nomor antrian dan diberi tahu kalau bukunya sudah bisa dipinjam.
             </p>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
               <a href="/api/peminjam/katalog" class="btn btn-secondary">Batal</a>
@@ -63,7 +63,7 @@
                   <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                   </svg>
-                  Ya, Daftarkan Saya
+                  Daftarkan Saya
                 </button>
               </form>
             </div>

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Scan QR Peminjaman — Perpustakaan SMA Pesat Bogor</title>
+  <title>Scan QR | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
   <script src="/vendor/jsqr/jsQR.js"></script>
   <style>
@@ -260,7 +260,7 @@
           <div class="preview-header">
             <div>
               <div class="preview-heading">Peminjaman Disetujui</div>
-              <div class="preview-sub">QR valid, peminjaman otomatis disetujui</div>
+              <div class="preview-sub">QR terbaca. Cek data di bawah.</div>
             </div>
           </div>
 
@@ -302,7 +302,7 @@
 
         <!-- SUCCESS -->
         <div class="state-card" id="state-success">
-          <div class="success-icon">✅</div>
+          <div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:64px;height:64px"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.5 3.5 6.5-6.5"/></svg></div>
           <div class="success-title">Peminjaman Disetujui!</div>
           <div class="success-name" id="s-nama"></div>
           <div class="success-book" id="s-judul"></div>
@@ -314,7 +314,6 @@
 
         <!-- ERROR -->
         <div class="state-card" id="state-error">
-          <div class="error-icon">❌</div>
           <div class="error-title">QR Tidak Valid</div>
           <div class="error-msg" id="error-msg"></div>
           <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
@@ -331,7 +330,7 @@
             </div>
             <div class="toolbar">
               <input type="text" id="manual-token" class="form-control flex-1"
-                     placeholder="Tempel token QR di sini…">
+                     placeholder="Tempel token QR di sini...">
               <button class="btn btn-primary" onclick="loadFromManual()">Verifikasi</button>
             </div>
           </div>
@@ -403,7 +402,7 @@
     const btn = document.getElementById('approve-btn') || { disabled: false, textContent: '' };
     if (btn) {
     btn.disabled = true;
-    btn.textContent = 'Memproses…';
+    btn.textContent = 'Memproses...';
 
     try {
       const res  = await API.put('/peminjaman/scan', { token: currentToken });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Riwayat Peminjaman — Perpustakaan SMA PESAT</title>
+  <title>Riwayat | Perpustakaan SMA PESAT</title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
           </svg>
         </span>
         <form action="/api/peminjam/searchBook" method="GET" style="display:contents;">
-          <input type="text" name="q" placeholder="Cari Koleksi...">
+          <input type="text" name="q" placeholder="Cari koleksi...">
         </form>
       </div>
       <div class="topbar-actions">
@@ -33,15 +33,15 @@
 
       <div class="card">
         <div class="card-header">
-          <span class="card-title">Semua Transaksi</span>
+          <span class="card-title">Riwayat Pinjaman</span>
           <span class="badge badge-gray"><%= peminjaman.length %> transaksi</span>
         </div>
         <% if (peminjaman.length === 0) { %>
         <div class="card-body">
           <div class="empty-state">
-            <div class="empty-state-icon">📋</div>
-            <h3>Belum ada riwayat peminjaman</h3>
-            <p>Mulai pinjam buku dari katalog perpustakaan.</p>
+            <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+            <h3>Belum ada riwayat</h3>
+            <p>Pinjam buku dulu di katalog.</p>
             <a href="/api/peminjam/katalog" class="btn btn-primary btn-sm" style="margin-top:12px;">Lihat Katalog</a>
           </div>
         </div>
@@ -66,13 +66,13 @@
                   <%= row.judul %>
                 </td>
                 <td class="text-muted">
-                  <%= row.tgl_pengajuan ? new Date(row.tgl_pengajuan).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—' %>
+                  <%= row.tgl_pengajuan ? new Date(row.tgl_pengajuan).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %>
                 </td>
                 <td class="text-muted">
-                  <%= row.tgl_kembali_rencana ? new Date(row.tgl_kembali_rencana).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—' %>
+                  <%= row.tgl_kembali_rencana ? new Date(row.tgl_kembali_rencana).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %>
                 </td>
                 <td class="text-muted">
-                  <%= row.tgl_kembali_aktual ? new Date(row.tgl_kembali_aktual).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—' %>
+                  <%= row.tgl_kembali_aktual ? new Date(row.tgl_kembali_aktual).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %>
                 </td>
                 <td>
                   <% 
